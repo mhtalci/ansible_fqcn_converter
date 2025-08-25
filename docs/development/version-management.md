@@ -2,10 +2,6 @@
 
 This document describes the semantic versioning system and version management processes for the FQCN Converter project.
 
-## Overview
-
-The project uses [Semantic Versioning (SemVer)](https://semver.org/) with automated version bumping based on [Conventional Commits](https://www.conventionalcommits.org/). This ensures consistent and predictable version management while maintaining clear communication about the nature of changes.
-
 ## Semantic Versioning
 
 Version numbers follow the `MAJOR.MINOR.PATCH` format:
@@ -15,19 +11,15 @@ Version numbers follow the `MAJOR.MINOR.PATCH` format:
 - **PATCH**: Incremented for backward-compatible bug fixes
 
 ### Pre-release Versions
-
-Pre-release versions can be created using the format `MAJOR.MINOR.PATCH-prerelease`:
-
 - `1.0.0-alpha.1`: Alpha release
-- `1.0.0-beta.1`: Beta release  
+- `1.0.0-beta.1`: Beta release
 - `1.0.0-rc.1`: Release candidate
 
 ## Conventional Commits
 
-The project follows the Conventional Commits specification for commit messages. This enables automatic version bumping and changelog generation.
+The project follows the [Conventional Commits](https://www.conventionalcommits.org/) specification for commit messages, enabling automatic version bumping and changelog generation.
 
 ### Commit Message Format
-
 ```
 <type>[optional scope]: <description>
 
@@ -36,31 +28,36 @@ The project follows the Conventional Commits specification for commit messages. 
 [optional footer(s)]
 ```
 
-### Commit Types
+### Commit Types and Version Impact
 
 | Type | Description | Version Impact |
 |------|-------------|----------------|
 | `feat` | New feature | MINOR |
 | `fix` | Bug fix | PATCH |
 | `docs` | Documentation changes | PATCH |
-| `style` | Code style changes (formatting, etc.) | PATCH |
+| `style` | Code style changes | PATCH |
 | `refactor` | Code refactoring | PATCH |
 | `perf` | Performance improvements | PATCH |
 | `test` | Adding or updating tests | PATCH |
 | `build` | Build system changes | PATCH |
 | `ci` | CI/CD changes | PATCH |
 | `chore` | Other changes | PATCH |
-| `revert` | Reverting previous commits | PATCH |
 
 ### Breaking Changes
+Breaking changes trigger a MAJOR version bump:
 
-Breaking changes trigger a MAJOR version bump and can be indicated in two ways:
+```bash
+# Using exclamation mark
+feat!: remove deprecated API
 
-1. **Exclamation mark**: `feat!: remove deprecated API`
-2. **Footer**: Include `BREAKING CHANGE:` in the commit body or footer
+# Using footer
+feat: add new conversion method
+
+BREAKING CHANGE: The convert_legacy method has been removed.
+Use convert_file with legacy=True parameter instead.
+```
 
 ### Examples
-
 ```bash
 # Feature addition (MINOR bump)
 feat(converter): add support for custom mapping files
@@ -71,21 +68,14 @@ fix(cli): handle missing configuration file gracefully
 # Breaking change (MAJOR bump)
 feat!: remove deprecated convert_legacy method
 
-BREAKING CHANGE: The convert_legacy method has been removed. 
-Use convert_file with legacy=True parameter instead.
-
 # Documentation update (PATCH bump)
 docs: update installation instructions for Python 3.12
-
-# Scoped change (PATCH bump)
-refactor(validator): improve error message formatting
 ```
 
 ## Version Management Tools
 
 ### CLI Tool
-
-The project includes a comprehensive version management CLI tool at `scripts/version_manager.py`:
+The project includes a version management CLI tool at `scripts/version_manager.py`:
 
 ```bash
 # Show current version
@@ -107,15 +97,9 @@ python scripts/version_manager.py validate
 
 # Show version history
 python scripts/version_manager.py history
-
-# Analyze commit compliance
-python scripts/version_manager.py analyze --verbose
 ```
 
 ### Makefile Targets
-
-Convenient Makefile targets are available for common version management tasks:
-
 ```bash
 # Version information
 make version-current        # Show current version
@@ -136,30 +120,9 @@ make version-analyze       # Analyze commit compliance
 make release-prepare       # Bump version and create tag
 ```
 
-## Automated Workflows
-
-### Pre-commit Hooks
-
-Version consistency is automatically validated via pre-commit hooks:
-
-- **Commitizen**: Validates commit message format
-- **Version Consistency**: Ensures version files are synchronized
-
-### CI/CD Integration
-
-The version management system integrates with CI/CD workflows:
-
-1. **Pull Request Validation**: Checks commit message format
-2. **Version Calculation**: Determines next version for releases
-3. **Automated Tagging**: Creates git tags for releases
-4. **Changelog Generation**: Updates CHANGELOG.md automatically
-
 ## Configuration Files
 
 ### Commitizen Configuration (`.cz.toml`)
-
-Configures conventional commit validation and version bumping:
-
 ```toml
 [tool.commitizen]
 name = "cz_conventional_commits"
@@ -172,45 +135,26 @@ version_files = [
 ```
 
 ### Version Files
-
 Version information is maintained in:
-
 - `src/fqcn_converter/_version.py`: Primary version definition
-- `pyproject.toml`: Package metadata (uses setuptools_scm)
+- `pyproject.toml`: Package metadata
 
 ## Development Workflow
 
 ### Making Changes
-
 1. **Create Feature Branch**: `git checkout -b feature/new-feature`
 2. **Make Changes**: Implement your changes
-3. **Commit with Conventional Format**: 
+3. **Commit with Conventional Format**:
    ```bash
    git commit -m "feat(converter): add new conversion method"
    ```
 4. **Push and Create PR**: Submit for review
 
 ### Preparing Releases
-
 1. **Validate Readiness**: `make release-check`
 2. **Prepare Release**: `make release-prepare`
 3. **Push Tags**: `git push --tags`
 4. **Create GitHub Release**: Automated via CI/CD
-
-### Version Validation
-
-Before releases, ensure version consistency:
-
-```bash
-# Check all version files are synchronized
-make version-validate
-
-# Analyze commit history for proper formatting
-make version-analyze
-
-# Preview next version
-make version-next
-```
 
 ## Troubleshooting
 
@@ -218,41 +162,37 @@ make version-next
 
 **Version Inconsistency**
 ```bash
-# Problem: Version files out of sync
+# Check version files are synchronized
 make version-validate
 
-# Solution: Update version files
+# Update version files
 python scripts/version_manager.py bump --dry-run
 ```
 
 **Invalid Commit Messages**
 ```bash
-# Problem: Commits don't follow conventional format
+# Analyze commit compliance
 make version-analyze
 
-# Solution: Use commitizen for guided commits
+# Use commitizen for guided commits
 cz commit
 ```
 
 **Missing Git Tags**
 ```bash
-# Problem: No version history
+# Show version history
 make version-history
 
-# Solution: Create initial tag
+# Create initial tag
 git tag -a v0.1.0 -m "Initial release"
 ```
 
 ### Manual Version Override
-
-In exceptional cases, you can manually override version bumping:
-
 ```bash
 # Force specific version type
 python scripts/version_manager.py bump --type major --force
 
-# Update version file directly (not recommended)
-# Edit src/fqcn_converter/_version.py
+# Validate after manual changes
 make version-validate
 ```
 
@@ -265,13 +205,6 @@ make version-validate
 5. **Review Version Bumps**: Verify calculated version bumps make sense
 6. **Keep Changelog Updated**: Ensure CHANGELOG.md reflects all changes
 
-## Integration with Context7
+---
 
-The version management system integrates with Context7 documentation generation:
-
-- Version information is automatically included in generated documentation
-- API documentation reflects the current version
-- Release notes can be generated from conventional commits
-- Version history is available in documentation
-
-This ensures that documentation always reflects the correct version information and provides users with accurate release information.
+This version management system ensures consistent and predictable versioning while maintaining clear communication about the nature of changes.

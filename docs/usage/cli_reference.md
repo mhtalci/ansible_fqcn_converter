@@ -32,7 +32,7 @@ Convert Ansible playbooks and roles to use Fully Qualified Collection Names (FQC
 **Examples of flexible flag placement:**
 ```bash
 fqcn-converter --verbose convert --dry-run
-fqcn-converter convert --verbose --dry-run  
+fqcn-converter convert --verbose --dry-run
 fqcn-converter convert --dry-run --verbose
 ```
 

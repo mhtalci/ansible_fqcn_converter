@@ -40,13 +40,6 @@ Brief description of the release, highlighting the most important changes and th
 - New guides or updated existing ones
 - API documentation changes
 
-## 🔧 Internal Changes
-
-- Code refactoring and improvements
-- Dependency updates
-- Build system changes
-- Testing improvements
-
 ## ⚠️ Breaking Changes
 
 ### Breaking Change Name
@@ -67,12 +60,6 @@ Brief description of the release, highlighting the most important changes and th
 - Benchmark results (if applicable)
 - Memory usage improvements
 
-## 🛠️ Developer Experience
-
-- Changes that improve the development workflow
-- New development tools or scripts
-- Updated contribution guidelines
-
 ## 📦 Dependencies
 
 ### Updated Dependencies
@@ -82,10 +69,6 @@ Brief description of the release, highlighting the most important changes and th
 ### New Dependencies
 - New dependencies added and why
 - Impact on installation size or requirements
-
-### Removed Dependencies
-- Dependencies that were removed
-- What replaced them or why they're no longer needed
 
 ## 🔗 Links
 
@@ -98,8 +81,6 @@ Brief description of the release, highlighting the most important changes and th
 - Total commits: {COMMIT_COUNT}
 - Contributors: {CONTRIBUTOR_COUNT}
 - Files changed: {FILES_CHANGED}
-- Lines added: {LINES_ADDED}
-- Lines removed: {LINES_REMOVED}
 
 ## 🙏 Acknowledgments
 
@@ -109,10 +90,6 @@ Special thanks to all contributors who made this release possible:
 - @contributor2 for bug fix Y
 - Community members who reported issues and provided feedback
 
-## 🚀 What's Next
-
-Preview of upcoming features and improvements planned for the next release.
-
 ---
 
 **Installation Instructions:**
@@ -121,16 +98,6 @@ Preview of upcoming features and improvements planned for the next release.
 # Install via pip
 pip install fqcn-converter=={VERSION}
 
-# Install from source
-git clone https://github.com/mhtalci/ansible_fqcn_converter.git
-cd ansible-fqcn-converter
-git checkout v{VERSION}
-pip install -e .
-```
-
-**Upgrade Instructions:**
-
-```bash
 # Upgrade existing installation
 pip install --upgrade fqcn-converter
 
@@ -151,7 +118,7 @@ Released on {DATE}
 This major release brings significant improvements and new capabilities to FQCN Converter:
 
 - **Key Feature 1**: Brief description
-- **Key Feature 2**: Brief description  
+- **Key Feature 2**: Brief description
 - **Key Improvement**: Brief description
 
 ## ⚠️ Breaking Changes and Migration Guide
@@ -186,30 +153,12 @@ This major release brings significant improvements and new capabilities to FQCN 
 
 [Standard improvements section]
 
-## 🔧 Under the Hood
-
-- Architecture improvements
-- Performance optimizations
-- Code quality enhancements
-
 ## 📚 Updated Documentation
 
 - Complete API reference update
 - New user guides
 - Migration documentation
 - Updated examples
-
-## 🛣️ Roadmap
-
-What to expect in future releases:
-- Planned features for v{NEXT_MINOR}
-- Long-term roadmap items
-
-## 💬 Community
-
-- Join our discussions on GitHub
-- Report issues and feature requests
-- Contribute to the project
 
 ---
 
@@ -302,65 +251,9 @@ This is a {PRERELEASE_TYPE} release intended for testing and feedback. **Not rec
    - Scenario 2: Steps to test
 3. Provide feedback: Link to feedback form or issue tracker
 
-## 📅 Release Timeline
-
-- Alpha: {ALPHA_DATE} (current)
-- Beta: {BETA_DATE} (planned)
-- Release Candidate: {RC_DATE} (planned)
-- Final Release: {FINAL_DATE} (planned)
-
 ---
 
 **Feedback Welcome**: Please test this pre-release and report any issues or suggestions.
-```
-
-## Hotfix Release Template (X.Y.Z - Critical Fix)
-
-```markdown
-# FQCN Converter v{VERSION} - Hotfix Release
-
-Released on {DATE}
-
-## 🚨 Critical Fix
-
-This hotfix addresses a critical issue discovered in v{PREVIOUS_VERSION}:
-
-**Issue**: Description of the critical issue
-**Impact**: Who is affected and how
-**Fix**: What was done to resolve it
-**Urgency**: Why immediate upgrade is recommended
-
-## 🐛 Bug Fixes
-
-- **Critical**: {CRITICAL_BUG_DESCRIPTION}
-- Additional fixes included in this hotfix
-
-## 🔒 Security (if applicable)
-
-- Security vulnerability details (after responsible disclosure)
-- CVE numbers if assigned
-- Severity level
-
-## 📦 Upgrade Instructions
-
-```bash
-# Immediate upgrade recommended
-pip install --upgrade fqcn-converter
-
-# Verify the fix
-fqcn-converter --version  # Should show v{VERSION}
-```
-
-## 🔍 Verification
-
-To verify the fix is working:
-1. Step 1 to verify
-2. Step 2 to verify
-3. Expected behavior
-
----
-
-**Recommendation**: All users of v{AFFECTED_VERSIONS} should upgrade immediately.
 ```
 
 ## Automated Generation
@@ -381,7 +274,6 @@ python scripts/changelog_generator.py release-notes v1.2.3 --from-tag v1.2.0
 ## Best Practices
 
 ### Content Guidelines
-
 1. **User-Focused**: Write from the user's perspective
 2. **Clear Impact**: Explain how changes affect users
 3. **Migration Help**: Provide clear upgrade instructions
@@ -389,7 +281,6 @@ python scripts/changelog_generator.py release-notes v1.2.3 --from-tag v1.2.0
 5. **Links**: Reference relevant documentation and issues
 
 ### Formatting Guidelines
-
 1. **Consistent Structure**: Use the same sections across releases
 2. **Emoji Usage**: Use emojis consistently for visual organization
 3. **Code Blocks**: Format code examples properly
@@ -397,17 +288,10 @@ python scripts/changelog_generator.py release-notes v1.2.3 --from-tag v1.2.0
 5. **Acknowledgments**: Credit contributors and community members
 
 ### Review Process
-
 1. **Technical Review**: Ensure accuracy of technical details
 2. **User Experience Review**: Check clarity for end users
-3. **Marketing Review**: Ensure messaging aligns with project goals
-4. **Community Review**: Get feedback from key community members
+3. **Community Review**: Get feedback from key community members
 
-### Distribution
-
-1. **GitHub Releases**: Primary distribution channel
-2. **Documentation Site**: Include in documentation
-3. **Community Channels**: Share in relevant forums and channels
-4. **Social Media**: Announce major releases appropriately
+---
 
 This template system ensures consistent, professional release notes that help users understand and adopt new versions effectively.
