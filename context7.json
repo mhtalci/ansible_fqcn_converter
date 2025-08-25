@@ -1,0 +1,70 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "Ansible FQCN Converter",
+  "description": "A production-ready tool for converting Ansible playbooks to use Fully Qualified Collection Names (FQCNs) with robust error handling, configurable mappings, and comprehensive validation.",
+  "folders": [
+    "src/fqcn_converter",
+    "docs",
+    "scripts"
+  ],
+  "excludeFolders": [
+    "__pycache__",
+    ".pytest_cache",
+    "build",
+    "dist",
+    "*.egg-info",
+    "venv",
+    ".venv",
+    "node_modules"
+  ],
+  "excludeFiles": [
+    "*.pyc",
+    "*.pyo",
+    "*.pyd",
+    ".DS_Store",
+    "*.log"
+  ],
+  "rules": [
+    "Use comprehensive docstrings with type hints for all public methods",
+    "Follow Google-style docstring format with Args, Returns, and Raises sections",
+    "Include practical usage examples in docstrings",
+    "Use dataclasses for structured return values",
+    "Implement proper error handling with custom exception hierarchy",
+    "Support both CLI and programmatic usage patterns",
+    "Provide configurable mappings and validation options",
+    "Use Context7 MCP for up-to-date documentation generation"
+  ],
+  "apiDocumentation": {
+    "enabled": true,
+    "extractFromDocstrings": true,
+    "includeTypeHints": true,
+    "includeExamples": true,
+    "outputFormat": "markdown",
+    "sections": [
+      "classes",
+      "methods",
+      "dataclasses",
+      "exceptions",
+      "examples",
+      "type_hints"
+    ]
+  },
+  "codeExamples": {
+    "extractFromDocstrings": true,
+    "validateSyntax": true,
+    "includeImports": true,
+    "categories": [
+      "basic_usage",
+      "advanced_configuration",
+      "batch_processing",
+      "validation",
+      "error_handling"
+    ]
+  },
+  "previousVersions": [
+    {
+      "tag": "v0.1.0",
+      "title": "Initial Production Release"
+    }
+  ]
+}

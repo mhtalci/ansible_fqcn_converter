@@ -1,0 +1,28 @@
+# Include the README and other important files
+include README.md
+include LICENSE
+include CHANGELOG.md
+include ROADMAP.md
+include CONTRIBUTING.md
+include CODE_OF_CONDUCT.md
+
+# Include configuration files
+recursive-include config *.yml *.yaml
+
+# Include package data
+include src/fqcn_converter/py.typed
+recursive-include src/fqcn_converter *.yml *.yaml
+
+# Include documentation
+recursive-include docs *.md *.rst *.txt
+
+# Exclude development and test files
+exclude .gitignore
+exclude .pre-commit-config.yaml
+exclude pyproject.toml.bak
+recursive-exclude tests *
+recursive-exclude test_* *
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+recursive-exclude * *.so
+recursive-exclude * .DS_Store

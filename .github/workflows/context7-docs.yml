@@ -1,0 +1,281 @@
+name: Context7 Documentation Generation
+
+"on":
+  push:
+    branches: [main, develop]
+    paths:
+      - 'src/**/*.py'
+      - 'docs/**/*.md'
+      - 'context7.json'
+      - 'scripts/generate_context7_docs.py'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**/*.py'
+      - 'docs/**/*.md'
+      - 'context7.json'
+      - 'scripts/generate_context7_docs.py'
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  generate-docs:
+    name: Generate Context7 API Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for proper documentation generation
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .
+        pip install -r requirements.txt
+    
+    - name: Generate Context7 API documentation
+      run: |
+        echo "🔄 Generating Context7 API documentation..."
+        python scripts/generate_context7_docs.py
+    
+    - name: Generate Context7 CLI documentation
+      run: |
+        echo "🔄 Generating Context7 CLI documentation..."
+        python scripts/generate_context7_cli_docs.py
+    
+    - name: Validate generated documentation
+      run: |
+        echo "✅ Validating generated documentation..."
+        
+        # Check if API reference files were generated
+        if [ ! -f "docs/reference/api/api_reference.md" ]; then
+          echo "❌ API reference markdown not generated"
+          exit 1
+        fi
+        
+        if [ ! -f "docs/reference/api/api_reference.json" ]; then
+          echo "❌ API reference JSON not generated"
+          exit 1
+        fi
+        
+        # Check if CLI reference files were generated
+        if [ ! -f "docs/usage/cli_reference.md" ]; then
+          echo "❌ CLI reference markdown not generated"
+          exit 1
+        fi
+        
+        if [ ! -f "docs/usage/cli_reference.json" ]; then
+          echo "❌ CLI reference JSON not generated"
+          exit 1
+        fi
+        
+        # Check file sizes (should not be empty)
+        api_md_size=$(stat -c%s "docs/reference/api/api_reference.md")
+        api_json_size=$(stat -c%s "docs/reference/api/api_reference.json")
+        cli_md_size=$(stat -c%s "docs/usage/cli_reference.md")
+        cli_json_size=$(stat -c%s "docs/usage/cli_reference.json")
+        
+        if [ "$api_md_size" -lt 1000 ]; then
+          echo "❌ API reference markdown too small ($api_md_size bytes)"
+          exit 1
+        fi
+        
+        if [ "$api_json_size" -lt 500 ]; then
+          echo "❌ API reference JSON too small ($api_json_size bytes)"
+          exit 1
+        fi
+        
+        if [ "$cli_md_size" -lt 1000 ]; then
+          echo "❌ CLI reference markdown too small ($cli_md_size bytes)"
+          exit 1
+        fi
+        
+        if [ "$cli_json_size" -lt 500 ]; then
+          echo "❌ CLI reference JSON too small ($cli_json_size bytes)"
+          exit 1
+        fi
+        
+        echo "✅ Documentation validation passed"
+        echo "   📄 API Markdown: $api_md_size bytes"
+        echo "   📄 API JSON: $api_json_size bytes"
+        echo "   📄 CLI Markdown: $cli_md_size bytes"
+        echo "   📄 CLI JSON: $cli_json_size bytes"
+    
+    - name: Extract code examples for validation
+      run: |
+        echo "🔍 Extracting and validating code examples..."
+        
+        # Create a script to extract and validate Python code blocks
+        cat > validate_examples.py << 'EOF'
+        import re
+        import ast
+        import sys
+        from pathlib import Path
+        
+        def validate_python_code(code):
+            """Validate Python code syntax."""
+            try:
+                ast.parse(code)
+                return True, None
+            except SyntaxError as e:
+                return False, str(e)
+        
+        def extract_code_blocks(file_path):
+            """Extract Python code blocks from markdown."""
+            with open(file_path, 'r') as f:
+                content = f.read()
+            
+            # Find Python code blocks
+            pattern = r'```python\n(.*?)\n```'
+            matches = re.findall(pattern, content, re.DOTALL)
+            return matches
+        
+        # Validate code examples in API reference
+        api_ref = Path("docs/reference/api/api_reference.md")
+        if api_ref.exists():
+            code_blocks = extract_code_blocks(api_ref)
+            print(f"Found {len(code_blocks)} Python code blocks")
+            
+            for i, code in enumerate(code_blocks):
+                valid, error = validate_python_code(code)
+                if not valid:
+                    print(f"❌ Code block {i+1} has syntax error: {error}")
+                    sys.exit(1)
+                else:
+                    print(f"✅ Code block {i+1} is valid")
+        
+        print("✅ All code examples validated successfully")
+        EOF
+        
+        python validate_examples.py
+    
+    - name: Check for documentation changes
+      id: check_changes
+      run: |
+        if git diff --quiet HEAD -- docs/reference/api/ docs/usage/; then
+          echo "changes=false" >> $GITHUB_OUTPUT
+          echo "📝 No documentation changes detected"
+        else
+          echo "changes=true" >> $GITHUB_OUTPUT
+          echo "📝 Documentation changes detected"
+          git diff --name-only HEAD -- docs/reference/api/ docs/usage/
+        fi
+    
+    - name: Commit documentation updates
+      if: steps.check_changes.outputs.changes == 'true' && github.event_name == 'push'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        git add docs/reference/api/ docs/usage/
+        git commit -m "📚 Auto-update Context7 documentation
+        
+        - Regenerated API reference from code docstrings
+        - Updated CLI reference from command help text
+        - Updated type hints and method signatures
+        - Validated code examples for syntax correctness
+        
+        Generated by: ${{ github.workflow }} #${{ github.run_number }}"
+        
+        git push
+    
+    - name: Create documentation summary
+      run: |
+        echo "## 📚 Context7 Documentation Generation Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Generated Files" >> $GITHUB_STEP_SUMMARY
+        echo "- 📄 \`docs/reference/api/api_reference.md\` - Markdown API reference" >> $GITHUB_STEP_SUMMARY
+        echo "- 📄 \`docs/reference/api/api_reference.json\` - JSON API data" >> $GITHUB_STEP_SUMMARY
+        echo "- 📄 \`docs/usage/cli_reference.md\` - Markdown CLI reference" >> $GITHUB_STEP_SUMMARY
+        echo "- 📄 \`docs/usage/cli_reference.json\` - JSON CLI data" >> $GITHUB_STEP_SUMMARY
+        echo "- 🔧 \`docs/usage/cli_examples.sh\` - Interactive CLI examples" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ -f "docs/reference/api/api_reference.md" ]; then
+          api_md_size=$(stat -c%s "docs/reference/api/api_reference.md")
+          cli_md_size=$(stat -c%s "docs/usage/cli_reference.md")
+          echo "### Documentation Stats" >> $GITHUB_STEP_SUMMARY
+          echo "- **API Reference Size:** $api_md_size bytes" >> $GITHUB_STEP_SUMMARY
+          echo "- **CLI Reference Size:** $cli_md_size bytes" >> $GITHUB_STEP_SUMMARY
+          
+          # Count classes and methods
+          class_count=$(grep -c "^### " docs/reference/api/api_reference.md || echo "0")
+          method_count=$(grep -c "^##### " docs/reference/api/api_reference.md || echo "0")
+          command_count=$(grep -c "^### " docs/usage/cli_reference.md || echo "0")
+          
+          echo "- **Classes Documented:** $class_count" >> $GITHUB_STEP_SUMMARY
+          echo "- **Methods Documented:** $method_count" >> $GITHUB_STEP_SUMMARY
+          echo "- **CLI Commands Documented:** $command_count" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Context7 Integration" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Docstrings extracted and formatted" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ CLI help text extracted and formatted" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Type hints integrated" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Code examples validated" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Interactive CLI examples generated" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ API reference generated" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ CLI reference generated" >> $GITHUB_STEP_SUMMARY
+    
+    - name: Upload documentation artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: context7-api-docs
+        path: |
+          docs/reference/api/
+          docs/usage/
+          context7.json
+        retention-days: 30
+
+  validate-context7-config:
+    name: Validate Context7 Configuration
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Validate context7.json
+      run: |
+        echo "🔍 Validating Context7 configuration..."
+        
+        # Check if context7.json exists and is valid JSON
+        if [ ! -f "context7.json" ]; then
+          echo "❌ context7.json not found"
+          exit 1
+        fi
+        
+        # Validate JSON syntax
+        if ! python -m json.tool context7.json > /dev/null; then
+          echo "❌ context7.json is not valid JSON"
+          exit 1
+        fi
+        
+        # Check required fields
+        python << 'EOF'
+        import json
+        
+        with open('context7.json', 'r') as f:
+            config = json.load(f)
+        
+        required_fields = ['projectTitle', 'description', 'folders']
+        for field in required_fields:
+            if field not in config:
+                print(f"❌ Missing required field: {field}")
+                exit(1)
+        
+        print("✅ Context7 configuration is valid")
+        print(f"   📁 Project: {config['projectTitle']}")
+        print(f"   📁 Folders: {len(config.get('folders', []))}")
+        print(f"   📁 Excluded: {len(config.get('excludeFolders', []))}")
+        EOF
+        
+        echo "✅ Context7 configuration validation passed"

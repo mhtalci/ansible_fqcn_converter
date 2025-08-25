@@ -1,0 +1,45 @@
+[flake8]
+max-line-length = 88
+extend-ignore = 
+    E203,  # whitespace before ':'
+    E701,  # multiple statements on one line (colon)
+    W503,  # line break before binary operator (deprecated)
+    W504,  # line break after binary operator (conflicts with W503)
+exclude = 
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    .tox,
+    .eggs,
+    *.egg,
+    build,
+    dist,
+    .mypy_cache,
+    .pytest_cache,
+    docs/_build,
+    migrations,
+    .github
+per-file-ignores =
+    __init__.py:F401,F403
+    tests/*:S101,S106,S108,S311,S602,S603,S607
+max-complexity = 10
+docstring-convention = google
+import-order-style = google
+application-import-names = fqcn_converter
+
+# Flake8 plugins configuration
+# flake8-docstrings
+docstring-convention = google
+ignore-decorators = @overload
+
+# flake8-bugbear
+extend-immutable-calls = 
+    pathlib.Path,
+    pathlib.PurePath
+
+# flake8-comprehensions
+# No additional configuration needed
+
+# flake8-simplify
+# No additional configuration needed

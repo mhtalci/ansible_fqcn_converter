@@ -1,0 +1,82 @@
+# GitHub Pages Configuration for Ansible FQCN Converter Documentation
+
+# Site settings
+title: "Ansible FQCN Converter Documentation"
+description: "Complete documentation for the Ansible FQCN Converter tool"
+baseurl: "/ansible-fqcn-converter"
+url: "https://org.github.io"
+
+# Repository information
+repository: "org/ansible-fqcn-converter"
+github_username: "org"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+theme: minima
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Exclude files from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - scripts/
+  - "*.py"
+  - "*.json"
+
+# Include files
+include:
+  - _pages
+
+# Collections
+collections:
+  docs:
+    output: true
+    permalink: /:collection/:name/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "docs"
+    values:
+      layout: "default"
+      nav_order: 1
+
+# Context7 integration
+context7:
+  enabled: true
+  auto_regenerate: true
+  api_docs_path: "reference/api"
+  cli_docs_path: "usage"
+
+# Version management
+versioning:
+  enabled: true
+  current_version: "0.1.0"
+  versions_path: "versions"
+
+# Navigation
+nav:
+  - title: "Home"
+    url: "/"
+  - title: "Installation"
+    url: "/installation/"
+  - title: "CLI Reference"
+    url: "/cli/"
+  - title: "API Reference"
+    url: "/api/"
+  - title: "Examples"
+    url: "/examples/"
+  - title: "Troubleshooting"
+    url: "/troubleshooting/"

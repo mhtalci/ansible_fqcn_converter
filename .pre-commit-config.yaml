@@ -1,0 +1,113 @@
+repos:
+  # Black - Python code formatter
+  - repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 25.1.0
+    hooks:
+      - id: black
+        language_version: python3.8
+        args: [--line-length=88]
+
+  # isort - Import sorting
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: [--profile=black, --line-length=88]
+
+  # Flake8 - Linting
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.1
+    hooks:
+      - id: flake8
+        additional_dependencies:
+          - flake8-docstrings
+          - flake8-bugbear
+          - flake8-comprehensions
+          - flake8-simplify
+        args: [--max-line-length=88, --extend-ignore=E203,E701]
+
+  # MyPy - Static type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.13.0
+    hooks:
+      - id: mypy
+        additional_dependencies:
+          - types-PyYAML
+          - types-colorama
+        args: [--strict, --show-error-codes]
+
+  # Bandit - Security linting
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.8.0
+    hooks:
+      - id: bandit
+        args: [-c, pyproject.toml]
+        additional_dependencies: [bandit[toml]]
+
+  # General hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: debug-statements
+      - id: requirements-txt-fixer
+
+  # YAML formatting
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v4.0.0-alpha.8
+    hooks:
+      - id: prettier
+        types: [yaml]
+        exclude: ^(\.pre-commit-config\.yaml|\.github/.*\.ya?ml)$
+
+  # Markdown formatting
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.42.0
+    hooks:
+      - id: markdownlint
+        args: [--fix]
+        exclude: ^(CHANGELOG\.md|docs/.*\.md)$
+
+  # Commitizen - Conventional commits
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.12.0
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+
+  # Context7 API Documentation Generation
+  - repo: local
+    hooks:
+      - id: version-consistency
+        name: Check Version Consistency
+        entry: python scripts/version_manager.py validate
+        language: system
+        files: ^(src/fqcn_converter/_version\.py|pyproject\.toml)$
+        pass_filenames: false
+      
+      - id: context7-docs
+        name: Generate Context7 API Documentation
+        entry: python scripts/pre-commit-context7-docs.py
+        language: system
+        files: ^src/.*\.py$
+        pass_filenames: false
+        always_run: false
+
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false

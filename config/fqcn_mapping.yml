@@ -1,0 +1,1245 @@
+# FQCN Mapping Configuration
+# This file defines the mapping from short module names to their Fully Qualified Collection Names (FQCN)
+# Used by the FQCN conversion script to modernize Ansible playbooks and roles
+# Enhanced with comprehensive collection support using Context7 documentation
+
+# Ansible Builtin Modules (ansible.builtin collection)
+ansible_builtin:
+  # File operations
+  copy: ansible.builtin.copy
+  file: ansible.builtin.file
+  template: ansible.builtin.template
+  lineinfile: ansible.builtin.lineinfile
+  replace: ansible.builtin.replace
+  blockinfile: ansible.builtin.blockinfile
+  find: ansible.builtin.find
+  stat: ansible.builtin.stat
+  fetch: ansible.builtin.fetch
+  synchronize: ansible.builtin.synchronize
+  unarchive: ansible.builtin.unarchive
+  archive: ansible.builtin.archive
+  slurp: ansible.builtin.slurp
+  assemble: ansible.builtin.assemble
+
+  # Package management
+  package: ansible.builtin.package
+  apt: ansible.builtin.apt
+  yum: ansible.builtin.yum
+  dnf: ansible.builtin.dnf
+  pip: ansible.builtin.pip
+  rpm_key: ansible.builtin.rpm_key
+  apt_key: ansible.builtin.apt_key
+  apt_repository: ansible.builtin.apt_repository
+  yum_repository: ansible.builtin.yum_repository
+
+  # Service management
+  service: ansible.builtin.service
+  systemd: ansible.builtin.systemd
+
+  # System operations
+  command: ansible.builtin.command
+  shell: ansible.builtin.shell
+  script: ansible.builtin.script
+  raw: ansible.builtin.raw
+  reboot: ansible.builtin.reboot
+  wait_for: ansible.builtin.wait_for
+  wait_for_connection: ansible.builtin.wait_for_connection
+
+  # User and group management
+  user: ansible.builtin.user
+  group: ansible.builtin.group
+
+  # Variables and facts
+  set_fact: ansible.builtin.set_fact
+  setup: ansible.builtin.setup
+  gather_facts: ansible.builtin.gather_facts
+
+  # Control flow
+  include: ansible.builtin.include
+  include_tasks: ansible.builtin.include_tasks
+  include_vars: ansible.builtin.include_vars
+  include_role: ansible.builtin.include_role
+  import_tasks: ansible.builtin.import_tasks
+  import_playbook: ansible.builtin.import_playbook
+  import_role: ansible.builtin.import_role
+
+  # Meta operations
+  meta: ansible.builtin.meta
+  fail: ansible.builtin.fail
+  debug: ansible.builtin.debug
+  assert: ansible.builtin.assert
+  pause: ansible.builtin.pause
+
+  # Network operations
+  uri: ansible.builtin.uri
+  get_url: ansible.builtin.get_url
+
+  # Cron and scheduling
+  cron: ansible.builtin.cron
+  at: ansible.builtin.at
+
+  # Mount operations
+  mount: ansible.builtin.mount
+
+  # Hostname operations
+  hostname: ansible.builtin.hostname
+
+  # Git operations
+  git: ansible.builtin.git
+
+  # Additional builtin modules
+  add_host: ansible.builtin.add_host
+  group_by: ansible.builtin.group_by
+  known_hosts: ansible.builtin.known_hosts
+  tempfile: ansible.builtin.tempfile
+  validate_argument_spec: ansible.builtin.validate_argument_spec
+
+# Ansible POSIX Collection (ansible.posix)
+ansible_posix:
+  # Access Control Lists
+  acl: ansible.posix.acl
+
+  # Scheduling
+  at: ansible.posix.at
+
+  # SSH key management
+  authorized_key: ansible.posix.authorized_key
+
+  # Firewall management
+  firewalld: ansible.posix.firewalld
+  firewalld_info: ansible.posix.firewalld_info
+
+  # Mount operations
+  mount: ansible.posix.mount
+
+  # Patch management
+  patch: ansible.posix.patch
+
+  # SELinux management
+  seboolean: ansible.posix.seboolean
+  selinux: ansible.posix.selinux
+
+  # File synchronization
+  synchronize: ansible.posix.synchronize
+
+  # System configuration
+  sysctl: ansible.posix.sysctl
+
+  # Profile and timing
+  profile_roles: ansible.posix.profile_roles
+  profile_tasks: ansible.posix.profile_tasks
+  timer: ansible.posix.timer
+
+  # JSON output
+  json: ansible.posix.json
+  jsonl: ansible.posix.jsonl
+
+  # RHEL specific modules
+  rhel_facts: ansible.posix.rhel_facts
+  rhel_rpm_ostree: ansible.posix.rhel_rpm_ostree
+  rpm_ostree_upgrade: ansible.posix.rpm_ostree_upgrade
+
+# Community General Collection modules
+community_general:
+  # System modules
+  alternatives: community.general.alternatives
+  capabilities: community.general.capabilities
+  cronvar: community.general.cronvar
+  dconf: community.general.dconf
+  filesystem: community.general.filesystem
+  gconftool2: community.general.gconftool2
+  interfaces_file: community.general.interfaces_file
+  iptables: community.general.iptables
+  iptables_state: community.general.iptables_state
+  java_cert: community.general.java_cert
+  java_keystore: community.general.java_keystore
+  kernel_blacklist: community.general.kernel_blacklist
+  locale_gen: community.general.locale_gen
+  lvg: community.general.lvg
+  lvol: community.general.lvol
+  make: community.general.make
+  modprobe: community.general.modprobe
+  open_iscsi: community.general.open_iscsi
+  osx_defaults: community.general.osx_defaults
+  pam_limits: community.general.pam_limits
+  parted: community.general.parted
+  pids: community.general.pids
+  puppet: community.general.puppet
+  python_requirements_info: community.general.python_requirements_info
+  selinux: community.general.selinux
+  sefcontext: community.general.sefcontext
+  selogin: community.general.selogin
+  seport: community.general.seport
+  snap: community.general.snap
+  sysctl: community.general.sysctl
+  timezone: community.general.timezone
+  ufw: community.general.ufw
+  xfconf: community.general.xfconf
+
+  # Package management
+  apk: community.general.apk
+  composer: community.general.composer
+  cpanm: community.general.cpanm
+  easy_install: community.general.easy_install
+  flatpak: community.general.flatpak
+  flatpak_remote: community.general.flatpak_remote
+  gem: community.general.gem
+  homebrew: community.general.homebrew
+  homebrew_cask: community.general.homebrew_cask
+  homebrew_tap: community.general.homebrew_tap
+  mas: community.general.mas
+  npm: community.general.npm
+  openbsd_pkg: community.general.openbsd_pkg
+  opkg: community.general.opkg
+  pacman: community.general.pacman
+  pacman_key: community.general.pacman_key
+  pear: community.general.pear
+  pip_package_info: community.general.pip_package_info
+  pipx: community.general.pipx
+  pkg5: community.general.pkg5
+  pkg5_publisher: community.general.pkg5_publisher
+  pkgin: community.general.pkgin
+  pkgng: community.general.pkgng
+  pkgutil: community.general.pkgutil
+  portage: community.general.portage
+  portinstall: community.general.portinstall
+  redhat_subscription: community.general.redhat_subscription
+  rhsm_release: community.general.rhsm_release
+  rhsm_repository: community.general.rhsm_repository
+  rhn_channel: community.general.rhn_channel
+  rhn_register: community.general.rhn_register
+  slackpkg: community.general.slackpkg
+  snap_alias: community.general.snap_alias
+  swdepot: community.general.swdepot
+  swupd: community.general.swupd
+  urpmi: community.general.urpmi
+  xbps: community.general.xbps
+  yarn: community.general.yarn
+  zypper: community.general.zypper
+  zypper_repository: community.general.zypper_repository
+
+  # Archive and compression
+  archive: community.general.archive
+  iso_extract: community.general.iso_extract
+
+  # Notification modules
+  campfire: community.general.campfire
+  flowdock: community.general.flowdock
+  hipchat: community.general.hipchat
+  irc: community.general.irc
+  jabber: community.general.jabber
+  mail: community.general.mail
+  mattermost: community.general.mattermost
+  mqtt: community.general.mqtt
+  nexmo: community.general.nexmo
+  office_365_connector_card: community.general.office_365_connector_card
+  pushbullet: community.general.pushbullet
+  pushover: community.general.pushover
+  rocketchat: community.general.rocketchat
+  say: community.general.say
+  sendgrid: community.general.sendgrid
+  slack: community.general.slack
+  snow_record: community.general.snow_record
+  snow_record_find: community.general.snow_record_find
+  telegram: community.general.telegram
+  twilio: community.general.twilio
+  typetalk: community.general.typetalk
+
+  # Web infrastructure
+  apache2_mod_wsgi: community.general.apache2_mod_wsgi
+  apache2_module: community.general.apache2_module
+  htpasswd: community.general.htpasswd
+  jira: community.general.jira
+  letsencrypt: community.general.letsencrypt
+  nginx_status_info: community.general.nginx_status_info
+
+  # Monitoring
+  airbrake_deployment: community.general.airbrake_deployment
+  datadog_event: community.general.datadog_event
+  datadog_monitor: community.general.datadog_monitor
+  honeybadger_deployment: community.general.honeybadger_deployment
+  icinga2_checkcommand: community.general.icinga2_checkcommand
+  icinga2_feature: community.general.icinga2_feature
+  icinga2_host: community.general.icinga2_host
+  logentries: community.general.logentries
+  logentries_msg: community.general.logentries_msg
+  logstash_plugin: community.general.logstash_plugin
+  monit: community.general.monit
+  nagios: community.general.nagios
+  newrelic_deployment: community.general.newrelic_deployment
+  pagerduty: community.general.pagerduty
+  pagerduty_alert: community.general.pagerduty_alert
+  pingdom: community.general.pingdom
+  rollbar_deployment: community.general.rollbar_deployment
+  sensu_check: community.general.sensu_check
+  sensu_client: community.general.sensu_client
+  sensu_handler: community.general.sensu_handler
+  sensu_silence: community.general.sensu_silence
+  sensu_subscription: community.general.sensu_subscription
+  stackdriver: community.general.stackdriver
+  statusio_maintenance: community.general.statusio_maintenance
+  zabbix_action: community.general.zabbix_action
+  zabbix_group: community.general.zabbix_group
+  zabbix_group_info: community.general.zabbix_group_info
+  zabbix_host: community.general.zabbix_host
+  zabbix_host_info: community.general.zabbix_host_info
+  zabbix_hostmacro: community.general.zabbix_hostmacro
+  zabbix_maintenance: community.general.zabbix_maintenance
+  zabbix_map: community.general.zabbix_map
+  zabbix_mediatype: community.general.zabbix_mediatype
+  zabbix_proxy: community.general.zabbix_proxy
+  zabbix_screen: community.general.zabbix_screen
+  zabbix_service: community.general.zabbix_service
+  zabbix_template: community.general.zabbix_template
+  zabbix_template_info: community.general.zabbix_template_info
+  zabbix_user: community.general.zabbix_user
+  zabbix_user_info: community.general.zabbix_user_info
+  zabbix_usergroup: community.general.zabbix_usergroup
+  zabbix_valuemap: community.general.zabbix_valuemap
+
+  # Cloud and infrastructure modules
+  linode: community.general.linode
+  linode_v4: community.general.linode_v4
+  proxmox: community.general.proxmox
+  proxmox_kvm: community.general.proxmox_kvm
+  proxmox_template: community.general.proxmox_template
+
+  # Version control
+  gitlab_branch: community.general.gitlab_branch
+  gitlab_deploy_key: community.general.gitlab_deploy_key
+  gitlab_group: community.general.gitlab_group
+  gitlab_hook: community.general.gitlab_hook
+  gitlab_project: community.general.gitlab_project
+  gitlab_project_variable: community.general.gitlab_project_variable
+  gitlab_runner: community.general.gitlab_runner
+  gitlab_user: community.general.gitlab_user
+
+  # Keycloak modules
+  keycloak_authentication: community.general.keycloak_authentication
+  keycloak_client: community.general.keycloak_client
+  keycloak_clientscope: community.general.keycloak_clientscope
+  keycloak_component_info: community.general.keycloak_component_info
+  keycloak_group: community.general.keycloak_group
+  keycloak_identity_provider: community.general.keycloak_identity_provider
+  keycloak_realm: community.general.keycloak_realm
+  keycloak_role: community.general.keycloak_role
+  keycloak_user: community.general.keycloak_user
+  keycloak_user_federation: community.general.keycloak_user_federation
+
+  # Additional system modules (already defined above, removing duplicates)
+
+  # Network modules
+  nmcli: community.general.nmcli
+
+  # Virtualization
+  lxc_container: community.general.lxc_container
+  lxd_container: community.general.lxd_container
+  lxd_profile: community.general.lxd_profile
+
+  # Additional package managers
+  cargo: community.general.cargo
+  conan: community.general.conan
+
+  # Cloud storage
+  rax: community.general.rax
+  rax_cbs: community.general.rax_cbs
+  rax_cdb: community.general.rax_cdb
+  rax_clb: community.general.rax_clb
+  rax_dns: community.general.rax_dns
+  rax_dns_record: community.general.rax_dns_record
+  rax_facts: community.general.rax_facts
+  rax_files: community.general.rax_files
+  rax_files_objects: community.general.rax_files_objects
+  rax_identity: community.general.rax_identity
+  rax_keypair: community.general.rax_keypair
+  rax_meta: community.general.rax_meta
+  rax_network: community.general.rax_network
+  rax_queue: community.general.rax_queue
+  rax_scaling_group: community.general.rax_scaling_group
+  rax_scaling_policy: community.general.rax_scaling_policy
+
+# Community Docker Collection
+community_docker:
+  # Container management
+  docker_container: community.docker.docker_container
+  docker_container_copy_into: community.docker.docker_container_copy_into
+  docker_container_exec: community.docker.docker_container_exec
+  docker_container_info: community.docker.docker_container_info
+
+  # Image management
+  docker_image: community.docker.docker_image
+  docker_image_build: community.docker.docker_image_build
+  docker_image_export: community.docker.docker_image_export
+  docker_image_info: community.docker.docker_image_info
+  docker_image_load: community.docker.docker_image_load
+  docker_image_pull: community.docker.docker_image_pull
+  docker_image_push: community.docker.docker_image_push
+  docker_image_remove: community.docker.docker_image_remove
+  docker_image_tag: community.docker.docker_image_tag
+
+  # Network management
+  docker_network: community.docker.docker_network
+  docker_network_info: community.docker.docker_network_info
+
+  # Volume management
+  docker_volume: community.docker.docker_volume
+  docker_volume_info: community.docker.docker_volume_info
+
+  # Docker Compose
+  docker_compose_v2: community.docker.docker_compose_v2
+  docker_compose_v2_exec: community.docker.docker_compose_v2_exec
+  docker_compose_v2_pull: community.docker.docker_compose_v2_pull
+  docker_compose_v2_run: community.docker.docker_compose_v2_run
+
+  # Docker Swarm
+  docker_swarm: community.docker.docker_swarm
+  docker_swarm_info: community.docker.docker_swarm_info
+  docker_swarm_service: community.docker.docker_swarm_service
+  docker_swarm_service_info: community.docker.docker_swarm_service_info
+  docker_node: community.docker.docker_node
+  docker_node_info: community.docker.docker_node_info
+  docker_stack: community.docker.docker_stack
+  docker_stack_info: community.docker.docker_stack_info
+  docker_stack_task_info: community.docker.docker_stack_task_info
+
+  # Docker secrets and configs
+  docker_secret: community.docker.docker_secret
+  docker_config: community.docker.docker_config
+
+  # Docker utilities
+  docker_host_info: community.docker.docker_host_info
+  docker_login: community.docker.docker_login
+  docker_prune: community.docker.docker_prune
+  docker_plugin: community.docker.docker_plugin
+  docker_context_info: community.docker.docker_context_info
+  current_container_facts: community.docker.current_container_facts
+
+# Community VMware Collection
+community_vmware:
+  # VM management
+  vmware_guest: community.vmware.vmware_guest
+  vmware_guest_info: community.vmware.vmware_guest_info
+  vmware_guest_powerstate: community.vmware.vmware_guest_powerstate
+  vmware_guest_tools_upgrade: community.vmware.vmware_guest_tools_upgrade
+  vmware_guest_tools_info: community.vmware.vmware_guest_tools_info
+  vmware_guest_network: community.vmware.vmware_guest_network
+  vmware_guest_disk: community.vmware.vmware_guest_disk
+  vmware_guest_controller: community.vmware.vmware_guest_controller
+  vmware_guest_serial_port: community.vmware.vmware_guest_serial_port
+  vmware_guest_tpm: community.vmware.vmware_guest_tpm
+  vmware_guest_cross_vc_clone: community.vmware.vmware_guest_cross_vc_clone
+  vmware_guest_instant_clone: community.vmware.vmware_guest_instant_clone
+  vmware_guest_file_operation: community.vmware.vmware_guest_file_operation
+  vmware_guest_storage_policy: community.vmware.vmware_guest_storage_policy
+  vmware_vm_info: community.vmware.vmware_vm_info
+  vmware_vm_inventory: community.vmware.vmware_vm_inventory
+  vmware_vm_shell: community.vmware.vmware_vm_shell
+  vmware_vmotion: community.vmware.vmware_vmotion
+  vmware_vm_config_option: community.vmware.vmware_vm_config_option
+
+  # Host management
+  vmware_host: community.vmware.vmware_host
+  vmware_host_info: community.vmware.vmware_host_info
+  vmware_host_inventory: community.vmware.vmware_host_inventory
+  vmware_host_powerstate: community.vmware.vmware_host_powerstate
+  vmware_host_dns: community.vmware.vmware_host_dns
+  vmware_host_firewall_manager: community.vmware.vmware_host_firewall_manager
+  vmware_host_graphics: community.vmware.vmware_host_graphics
+  vmware_host_lockdown: community.vmware.vmware_host_lockdown
+  vmware_host_lockdown_exceptions: community.vmware.vmware_host_lockdown_exceptions
+  vmware_host_snmp: community.vmware.vmware_host_snmp
+  vmware_maintenancemode: community.vmware.vmware_maintenancemode
+  vmware_migrate_vmk: community.vmware.vmware_migrate_vmk
+
+  # Cluster management
+  vmware_cluster_info: community.vmware.vmware_cluster_info
+  vmware_cluster_ha: community.vmware.vmware_cluster_ha
+  vmware_cluster_dpm: community.vmware.vmware_cluster_dpm
+  vmware_cluster_drs_recommendations: community.vmware.vmware_cluster_drs_recommendations
+  vmware_drs_override: community.vmware.vmware_drs_override
+
+  # Network management
+  vmware_dvswitch: community.vmware.vmware_dvswitch
+  vmware_dvswitch_nioc: community.vmware.vmware_dvswitch_nioc
+  vmware_dvswitch_pvlans: community.vmware.vmware_dvswitch_pvlans
+  vmware_dvs_portgroup: community.vmware.vmware_dvs_portgroup
+  vmware_dvs_portgroup_info: community.vmware.vmware_dvs_portgroup_info
+  vmware_vswitch: community.vmware.vmware_vswitch
+  vmware_vm_vss_dvs_migrate: community.vmware.vmware_vm_vss_dvs_migrate
+
+  # Storage management
+  vmware_target_canonical_info: community.vmware.vmware_target_canonical_info
+  vmware_vsan_cluster: community.vmware.vmware_vsan_cluster
+  vmware_vsan_health_info: community.vmware.vmware_vsan_health_info
+
+  # Content library
+  vmware_content_library_manager: community.vmware.vmware_content_library_manager
+  vmware_content_deploy_template: community.vmware.vmware_content_deploy_template
+  vmware_content_deploy_ovf_template: community.vmware.vmware_content_deploy_ovf_template
+  vmware_deploy_ovf: community.vmware.vmware_deploy_ovf
+
+  # vCenter management
+  vcenter_folder: community.vmware.vcenter_folder
+  vcenter_extension: community.vmware.vcenter_extension
+  vcenter_standard_key_provider: community.vmware.vcenter_standard_key_provider
+
+  # Resource management
+  vmware_resource_pool: community.vmware.vmware_resource_pool
+  vmware_object_role_permission: community.vmware.vmware_object_role_permission
+
+  # Snapshots
+  vmware_all_snapshots_info: community.vmware.vmware_all_snapshots_info
+
+  # Categories and tags
+  vmware_category: community.vmware.vmware_category
+
+  # Infrastructure profiles
+  vmware_vc_infraprofile_info: community.vmware.vmware_vc_infraprofile_info
+
+  # Tools
+  vmware_tools: community.vmware.vmware_tools
+
+# Community DNS Collection
+community_dns:
+  # DNS record management
+  hosttech_dns_record: community.dns.hosttech_dns_record
+  hosttech_dns_record_info: community.dns.hosttech_dns_record_info
+  hosttech_dns_record_set: community.dns.hosttech_dns_record_set
+  hosttech_dns_record_sets: community.dns.hosttech_dns_record_sets
+
+  # Hetzner DNS
+  hetzner_dns_record: community.dns.hetzner_dns_record
+  hetzner_dns_record_info: community.dns.hetzner_dns_record_info
+  hetzner_dns_record_set: community.dns.hetzner_dns_record_set
+  hetzner_dns_record_sets: community.dns.hetzner_dns_record_sets
+  hetzner_dns_zone: community.dns.hetzner_dns_zone
+  hetzner_dns_zone_info: community.dns.hetzner_dns_zone_info
+
+  # Generic DNS modules
+  wait_for_txt: community.dns.wait_for_txt
+  nameserver_info: community.dns.nameserver_info
+  nameserver_record_info: community.dns.nameserver_record_info
+
+# Community Crypto Collection
+community_crypto:
+  # Certificate management
+  acme_account: community.crypto.acme_account
+  acme_account_info: community.crypto.acme_account_info
+  acme_certificate: community.crypto.acme_certificate
+  acme_certificate_revoke: community.crypto.acme_certificate_revoke
+  acme_challenge_cert_helper: community.crypto.acme_challenge_cert_helper
+  acme_inspect: community.crypto.acme_inspect
+
+  # Certificate generation
+  openssl_certificate: community.crypto.openssl_certificate
+  openssl_certificate_info: community.crypto.openssl_certificate_info
+  openssl_csr: community.crypto.openssl_csr
+  openssl_csr_info: community.crypto.openssl_csr_info
+  openssl_dhparam: community.crypto.openssl_dhparam
+  openssl_pkcs12: community.crypto.openssl_pkcs12
+  openssl_privatekey: community.crypto.openssl_privatekey
+  openssl_privatekey_info: community.crypto.openssl_privatekey_info
+  openssl_publickey: community.crypto.openssl_publickey
+  openssl_publickey_info: community.crypto.openssl_publickey_info
+
+  # X.509 certificate management
+  x509_certificate: community.crypto.x509_certificate
+  x509_certificate_info: community.crypto.x509_certificate_info
+  x509_crl: community.crypto.x509_crl
+  x509_crl_info: community.crypto.x509_crl_info
+
+  # Cryptographic operations
+  openssh_cert: community.crypto.openssh_cert
+  openssh_keypair: community.crypto.openssh_keypair
+
+  # LUKS encryption
+  luks_device: community.crypto.luks_device
+
+# Community Proxmox Collection
+community_proxmox:
+  # Proxmox VE management
+  proxmox: community.proxmox.proxmox
+  proxmox_kvm: community.proxmox.proxmox_kvm
+  proxmox_template: community.proxmox.proxmox_template
+  proxmox_user: community.proxmox.proxmox_user
+  proxmox_group: community.proxmox.proxmox_group
+  proxmox_domain_info: community.proxmox.proxmox_domain_info
+  proxmox_node_info: community.proxmox.proxmox_node_info
+  proxmox_pool: community.proxmox.proxmox_pool
+  proxmox_storage_info: community.proxmox.proxmox_storage_info
+  proxmox_tasks_info: community.proxmox.proxmox_tasks_info
+  proxmox_vm_info: community.proxmox.proxmox_vm_info
+
+# Community RouterOS Collection
+community_routeros:
+  # RouterOS API
+  api: community.routeros.api
+  api_info: community.routeros.api_info
+  api_modify: community.routeros.api_modify
+
+# Community MySQL Collection
+community_mysql:
+  mysql_db: community.mysql.mysql_db
+  mysql_info: community.mysql.mysql_info
+  mysql_query: community.mysql.mysql_query
+  mysql_replication: community.mysql.mysql_replication
+  mysql_user: community.mysql.mysql_user
+  mysql_variables: community.mysql.mysql_variables
+
+# Community PostgreSQL Collection
+community_postgresql:
+  postgresql_copy: community.postgresql.postgresql_copy
+  postgresql_db: community.postgresql.postgresql_db
+  postgresql_ext: community.postgresql.postgresql_ext
+  postgresql_info: community.postgresql.postgresql_info
+  postgresql_lang: community.postgresql.postgresql_lang
+  postgresql_membership: community.postgresql.postgresql_membership
+  postgresql_owner: community.postgresql.postgresql_owner
+  postgresql_pg_hba: community.postgresql.postgresql_pg_hba
+  postgresql_ping: community.postgresql.postgresql_ping
+  postgresql_privs: community.postgresql.postgresql_privs
+  postgresql_publication: community.postgresql.postgresql_publication
+  postgresql_query: community.postgresql.postgresql_query
+  postgresql_schema: community.postgresql.postgresql_schema
+  postgresql_script: community.postgresql.postgresql_script
+  postgresql_sequence: community.postgresql.postgresql_sequence
+  postgresql_set: community.postgresql.postgresql_set
+  postgresql_slot: community.postgresql.postgresql_slot
+  postgresql_subscription: community.postgresql.postgresql_subscription
+  postgresql_table: community.postgresql.postgresql_table
+  postgresql_tablespace: community.postgresql.postgresql_tablespace
+  postgresql_user: community.postgresql.postgresql_user
+  postgresql_user_obj_stat_info: community.postgresql.postgresql_user_obj_stat_info
+
+# Community MongoDB Collection
+community_mongodb:
+  mongodb_balancer: community.mongodb.mongodb_balancer
+  mongodb_index: community.mongodb.mongodb_index
+  mongodb_info: community.mongodb.mongodb_info
+  mongodb_maintenance: community.mongodb.mongodb_maintenance
+  mongodb_monitoring: community.mongodb.mongodb_monitoring
+  mongodb_oplog: community.mongodb.mongodb_oplog
+  mongodb_parameter: community.mongodb.mongodb_parameter
+  mongodb_replicaset: community.mongodb.mongodb_replicaset
+  mongodb_shard: community.mongodb.mongodb_shard
+  mongodb_shutdown: community.mongodb.mongodb_shutdown
+  mongodb_status: community.mongodb.mongodb_status
+  mongodb_stepdown: community.mongodb.mongodb_stepdown
+  mongodb_user: community.mongodb.mongodb_user
+
+# Collection dependencies for each module type
+collection_dependencies:
+  ansible.builtin: []  # Built-in, no external dependencies
+  ansible.posix:
+    - name: ansible.posix
+      version: ">=1.0.0"
+  community.general:
+    - name: community.general
+      version: ">=6.0.0"
+  community.docker:
+    - name: community.docker
+      version: ">=3.0.0"
+  community.vmware:
+    - name: community.vmware
+      version: ">=3.0.0"
+  community.dns:
+    - name: community.dns
+      version: ">=2.0.0"
+  community.crypto:
+    - name: community.crypto
+      version: ">=2.0.0"
+  community.proxmox:
+    - name: community.proxmox
+      version: ">=1.0.0"
+  community.routeros:
+    - name: community.routeros
+      version: ">=2.0.0"
+  community.mysql:
+    - name: community.mysql
+      version: ">=3.0.0"
+  community.postgresql:
+    - name: community.postgresql
+      version: ">=2.0.0"
+  community.mongodb:
+    - name: community.mongodb
+      version: ">=1.0.0"
+  ansible.windows:
+    - name: ansible.windows
+      version: ">=1.0.0"
+  kubernetes.core:
+    - name: kubernetes.core
+      version: ">=2.0.0"
+  cisco.ios:
+    - name: cisco.ios
+      version: ">=4.0.0"
+  community.windows:
+    - name: community.windows
+      version: ">=1.0.0"
+  community.network:
+    - name: community.network
+      version: ">=5.0.0"
+  community.zabbix:
+    - name: community.zabbix
+      version: ">=1.0.0"
+  amazon.aws:
+    - name: amazon.aws
+      version: ">=5.0.0"
+  azure.azcollection:
+    - name: azure.azcollection
+      version: ">=1.0.0"
+  google.cloud:
+    - name: google.cloud
+      version: ">=1.0.0"
+  ansible.netcommon:
+    - name: ansible.netcommon
+      version: ">=4.0.0"
+  ansible.utils:
+    - name: ansible.utils
+      version: ">=2.0.0"
+
+# Module validation patterns
+validation_patterns:
+  # Patterns to identify module usage in task files
+  module_task_pattern: '^\s*-?\s*name:\s*.*\n\s*([a-zA-Z_][a-zA-Z0-9_]*):.*'
+  fqcn_pattern: '^\s*-?\s*name:\s*.*\n\s*([a-zA-Z_][a-zA-Z0-9_]*\.[a-zA-Z_][a-zA-Z0-9_]*\.[a-zA-Z_][a-zA-Z0-9_]*):.*'
+
+  # File patterns to process
+  task_file_patterns:
+    - "roles/*/tasks/*.yml"
+    - "roles/*/tasks/*.yaml"
+    - "playbooks/*.yml"
+    - "playbooks/*.yaml"
+    - "*.yml"
+    - "*.yaml"
+
+  # Files to exclude from processing
+  exclude_patterns:
+    - "molecule/"
+    - ".molecule/"
+    - "tests/"
+    - ".git/"
+    - ".github/"
+    - "collections/"
+    - "group_vars/"
+    - "host_vars/"
+    - "vars/"
+
+# Conversion rules and special cases
+conversion_rules:
+  # Special handling for certain modules
+  special_cases:
+    # Some modules might need special parameter handling
+    include:
+      replacement: ansible.builtin.include_tasks
+      note: "include is deprecated, use include_tasks instead"
+
+    # Modules that have been moved or renamed
+    docker:
+      replacement: community.docker.docker_container
+      note: "docker module moved to community.docker collection"
+
+    docker_container:
+      replacement: community.docker.docker_container
+      note: "docker_container moved to community.docker collection"
+
+    docker_image:
+      replacement: community.docker.docker_image
+      note: "docker_image moved to community.docker collection"
+
+  # Modules that require additional collection installation
+  requires_collection:
+    - ansible.posix
+    - ansible.windows
+    - ansible.netcommon
+    - ansible.utils
+    - community.general
+    - community.docker
+    - community.vmware
+    - community.dns
+    - community.crypto
+    - community.proxmox
+    - community.routeros
+    - community.mysql
+    - community.postgresql
+    - community.mongodb
+    - community.windows
+    - community.network
+    - community.zabbix
+    - kubernetes.core
+    - cisco.ios
+    - amazon.aws
+    - azure.azcollection
+    - google.cloud
+
+# Backup and rollback configuration
+backup_config:
+  backup_suffix: ".fqcn_backup"
+  create_backup: true
+  backup_directory: ".fqcn_backups"
+
+rollback_config:
+  rollback_suffix: ".fqcn_rollback"
+  keep_rollback_files: true
+# Ansible Windows Collection
+ansible_windows:
+  # Windows system management
+  win_command: ansible.windows.win_command
+  win_shell: ansible.windows.win_shell
+  win_powershell: ansible.windows.win_powershell
+  win_copy: ansible.windows.win_copy
+  win_file: ansible.windows.win_file
+  win_template: ansible.windows.win_template
+  win_lineinfile: ansible.windows.win_lineinfile
+  win_find: ansible.windows.win_find
+  win_stat: ansible.windows.win_stat
+  win_get_url: ansible.windows.win_get_url
+  win_uri: ansible.windows.win_uri
+
+  # Windows package management
+  win_package: ansible.windows.win_package
+  win_chocolatey: ansible.windows.win_chocolatey
+  win_feature: ansible.windows.win_feature
+  win_optional_feature: ansible.windows.win_optional_feature
+  win_updates: ansible.windows.win_updates
+  win_hotfix: ansible.windows.win_hotfix
+
+  # Windows service management
+  win_service: ansible.windows.win_service
+  win_service_info: ansible.windows.win_service_info
+
+  # Windows user and group management
+  win_user: ansible.windows.win_user
+  win_user_right: ansible.windows.win_user_right
+  win_group: ansible.windows.win_group
+  win_group_membership: ansible.windows.win_group_membership
+
+  # Windows registry
+  win_regedit: ansible.windows.win_regedit
+  win_reg_stat: ansible.windows.win_reg_stat
+
+  # Windows networking
+  win_dns_client: ansible.windows.win_dns_client
+  win_hostname: ansible.windows.win_hostname
+  win_firewall: ansible.windows.win_firewall
+  win_firewall_rule: ansible.windows.win_firewall_rule
+
+  # Windows system configuration
+  win_environment: ansible.windows.win_environment
+  win_path: ansible.windows.win_path
+  win_timezone: ansible.windows.win_timezone
+  win_region: ansible.windows.win_region
+  win_owner: ansible.windows.win_owner
+  win_acl: ansible.windows.win_acl
+  win_acl_inheritance: ansible.windows.win_acl_inheritance
+  win_certificate_store: ansible.windows.win_certificate_store
+  win_eventlog: ansible.windows.win_eventlog
+  win_eventlog_entry: ansible.windows.win_eventlog_entry
+
+  # Windows shares and drives
+  win_share: ansible.windows.win_share
+  win_mapped_drive: ansible.windows.win_mapped_drive
+
+  # Windows processes and tasks
+  win_process: ansible.windows.win_process
+  win_scheduled_task: ansible.windows.win_scheduled_task
+  win_scheduled_task_stat: ansible.windows.win_scheduled_task_stat
+
+  # Windows system operations
+  win_reboot: ansible.windows.win_reboot
+  win_wait_for: ansible.windows.win_wait_for
+  win_ping: ansible.windows.win_ping
+
+# Kubernetes Core Collection
+kubernetes_core:
+  # Kubernetes resource management
+  k8s: kubernetes.core.k8s
+  k8s_info: kubernetes.core.k8s_info
+  k8s_scale: kubernetes.core.k8s_scale
+  k8s_drain: kubernetes.core.k8s_drain
+  k8s_taint: kubernetes.core.k8s_taint
+  k8s_service: kubernetes.core.k8s_service
+  k8s_exec: kubernetes.core.k8s_exec
+  k8s_cp: kubernetes.core.k8s_cp
+  k8s_log: kubernetes.core.k8s_log
+  k8s_json_patch: kubernetes.core.k8s_json_patch
+  k8s_rollback: kubernetes.core.k8s_rollback
+  k8s_cluster_info: kubernetes.core.k8s_cluster_info
+
+  # Helm package management
+  helm: kubernetes.core.helm
+  helm_info: kubernetes.core.helm_info
+  helm_plugin: kubernetes.core.helm_plugin
+  helm_plugin_info: kubernetes.core.helm_plugin_info
+  helm_pull: kubernetes.core.helm_pull
+  helm_registry_auth: kubernetes.core.helm_registry_auth
+  helm_repository: kubernetes.core.helm_repository
+  helm_template: kubernetes.core.helm_template
+
+# Cisco IOS Collection
+cisco_ios:
+  # IOS configuration
+  ios_config: cisco.ios.ios_config
+  ios_command: cisco.ios.ios_command
+  ios_facts: cisco.ios.ios_facts
+  ios_interfaces: cisco.ios.ios_interfaces
+  ios_l2_interfaces: cisco.ios.ios_l2_interfaces
+  ios_l3_interfaces: cisco.ios.ios_l3_interfaces
+  ios_lacp: cisco.ios.ios_lacp
+  ios_lacp_interfaces: cisco.ios.ios_lacp_interfaces
+  ios_lag_interfaces: cisco.ios.ios_lag_interfaces
+  ios_lldp_global: cisco.ios.ios_lldp_global
+  ios_lldp_interfaces: cisco.ios.ios_lldp_interfaces
+  ios_logging_global: cisco.ios.ios_logging_global
+  ios_ntp_global: cisco.ios.ios_ntp_global
+  ios_ospf_interfaces: cisco.ios.ios_ospf_interfaces
+  ios_ospfv2: cisco.ios.ios_ospfv2
+  ios_ospfv3: cisco.ios.ios_ospfv3
+  ios_prefix_lists: cisco.ios.ios_prefix_lists
+  ios_route_maps: cisco.ios.ios_route_maps
+  ios_static_routes: cisco.ios.ios_static_routes
+  ios_system: cisco.ios.ios_system
+  ios_user: cisco.ios.ios_user
+  ios_vlans: cisco.ios.ios_vlans
+  ios_vrf: cisco.ios.ios_vrf
+  ios_acls: cisco.ios.ios_acls
+  ios_bgp_address_family: cisco.ios.ios_bgp_address_family
+  ios_bgp_global: cisco.ios.ios_bgp_global
+  ios_hostname: cisco.ios.ios_hostname
+  ios_snmp_server: cisco.ios.ios_snmp_server
+
+# Community Windows Collection
+community_windows:
+  # Windows system utilities
+  win_audit_policy_system: community.windows.win_audit_policy_system
+  win_audit_rule: community.windows.win_audit_rule
+  win_computer_description: community.windows.win_computer_description
+  win_credential: community.windows.win_credential
+  win_data_deduplication: community.windows.win_data_deduplication
+  win_defrag: community.windows.win_defrag
+  win_dhcp_lease: community.windows.win_dhcp_lease
+  win_disk_facts: community.windows.win_disk_facts
+  win_disk_image: community.windows.win_disk_image
+  win_dns_record: community.windows.win_dns_record
+  win_dns_zone: community.windows.win_dns_zone
+  win_domain_computer: community.windows.win_domain_computer
+  win_domain_group: community.windows.win_domain_group
+  win_domain_group_membership: community.windows.win_domain_group_membership
+  win_domain_user: community.windows.win_domain_user
+  win_dsc: community.windows.win_dsc
+  win_format: community.windows.win_format
+  win_hosts: community.windows.win_hosts
+  win_http_proxy: community.windows.win_http_proxy
+  win_iis_virtualdirectory: community.windows.win_iis_virtualdirectory
+  win_iis_webapplication: community.windows.win_iis_webapplication
+  win_iis_webapppool: community.windows.win_iis_webapppool
+  win_iis_webbinding: community.windows.win_iis_webbinding
+  win_iis_website: community.windows.win_iis_website
+  win_initialize_disk: community.windows.win_initialize_disk
+  win_lineinfile: community.windows.win_lineinfile
+  win_listen_ports_facts: community.windows.win_listen_ports_facts
+  win_msg: community.windows.win_msg
+  win_netbios: community.windows.win_netbios
+  win_nssm: community.windows.win_nssm
+  win_pagefile: community.windows.win_pagefile
+  win_partition: community.windows.win_partition
+  win_pester: community.windows.win_pester
+  win_power_plan: community.windows.win_power_plan
+  win_product_facts: community.windows.win_product_facts
+  win_psexec: community.windows.win_psexec
+  win_psmodule: community.windows.win_psmodule
+  win_psmodule_info: community.windows.win_psmodule_info
+  win_psrepository: community.windows.win_psrepository
+  win_psrepository_info: community.windows.win_psrepository_info
+  win_pssession_configuration: community.windows.win_pssession_configuration
+  win_rabbitmq_plugin: community.windows.win_rabbitmq_plugin
+  win_rds_cap: community.windows.win_rds_cap
+  win_rds_rap: community.windows.win_rds_rap
+  win_rds_settings: community.windows.win_rds_settings
+  win_regmerge: community.windows.win_regmerge
+  win_robocopy: community.windows.win_robocopy
+  win_route: community.windows.win_route
+  win_say: community.windows.win_say
+  win_scoop: community.windows.win_scoop
+  win_scoop_bucket: community.windows.win_scoop_bucket
+  win_security_policy: community.windows.win_security_policy
+  win_shortcut: community.windows.win_shortcut
+  win_snmp: community.windows.win_snmp
+  win_toast: community.windows.win_toast
+  win_unzip: community.windows.win_unzip
+  win_user_profile: community.windows.win_user_profile
+  win_wakeonlan: community.windows.win_wakeonlan
+  win_webpicmd: community.windows.win_webpicmd
+  win_xml: community.windows.win_xml
+
+# Community Network Collection
+community_network:
+  # Network device management
+  aireos_command: community.network.aireos_command
+  aireos_config: community.network.aireos_config
+  apconos_command: community.network.apconos_command
+  apconos_config: community.network.apconos_config
+  aruba_command: community.network.aruba_command
+  aruba_config: community.network.aruba_config
+  ce_command: community.network.ce_command
+  ce_config: community.network.ce_config
+  ce_facts: community.network.ce_facts
+  cnos_command: community.network.cnos_command
+  cnos_config: community.network.cnos_config
+  cnos_facts: community.network.cnos_facts
+  edgeos_command: community.network.edgeos_command
+  edgeos_config: community.network.edgeos_config
+  edgeos_facts: community.network.edgeos_facts
+  edgeswitch_facts: community.network.edgeswitch_facts
+  enos_command: community.network.enos_command
+  enos_config: community.network.enos_config
+  enos_facts: community.network.enos_facts
+  eric_eccli_command: community.network.eric_eccli_command
+  exos_command: community.network.exos_command
+  exos_config: community.network.exos_config
+  exos_facts: community.network.exos_facts
+  icx_command: community.network.icx_command
+  icx_config: community.network.icx_config
+  icx_facts: community.network.icx_facts
+  ironware_command: community.network.ironware_command
+  ironware_config: community.network.ironware_config
+  ironware_facts: community.network.ironware_facts
+  netvisor_pn_cluster: community.network.netvisor_pn_cluster
+  netvisor_pn_ospf: community.network.netvisor_pn_ospf
+  netvisor_pn_show: community.network.netvisor_pn_show
+  netvisor_pn_trunk: community.network.netvisor_pn_trunk
+  netvisor_pn_vlag: community.network.netvisor_pn_vlag
+  netvisor_pn_vlan: community.network.netvisor_pn_vlan
+  netvisor_pn_vrouter: community.network.netvisor_pn_vrouter
+  netvisor_pn_vrouterif: community.network.netvisor_pn_vrouterif
+  netvisor_pn_vxlan: community.network.netvisor_pn_vxlan
+  nos_command: community.network.nos_command
+  nos_config: community.network.nos_config
+  nos_facts: community.network.nos_facts
+  ordnance_command: community.network.ordnance_command
+  ordnance_config: community.network.ordnance_config
+  ordnance_facts: community.network.ordnance_facts
+  panos_admin: community.network.panos_admin
+  panos_admpwd: community.network.panos_admpwd
+  panos_cert_gen_ssh: community.network.panos_cert_gen_ssh
+  panos_check: community.network.panos_check
+  panos_commit: community.network.panos_commit
+  panos_dag: community.network.panos_dag
+  panos_dag_tags: community.network.panos_dag_tags
+  panos_import: community.network.panos_import
+  panos_interface: community.network.panos_interface
+  panos_lic: community.network.panos_lic
+  panos_loadcfg: community.network.panos_loadcfg
+  panos_match_rule: community.network.panos_match_rule
+  panos_mgtconfig: community.network.panos_mgtconfig
+  panos_nat_rule: community.network.panos_nat_rule
+  panos_object: community.network.panos_object
+  panos_op: community.network.panos_op
+  panos_pg: community.network.panos_pg
+  panos_query_rules: community.network.panos_query_rules
+  panos_restart: community.network.panos_restart
+  panos_sag: community.network.panos_sag
+  panos_security_rule: community.network.panos_security_rule
+  panos_set: community.network.panos_set
+  panos_software: community.network.panos_software
+  panos_type_cmd: community.network.panos_type_cmd
+  slxos_command: community.network.slxos_command
+  slxos_config: community.network.slxos_config
+  slxos_facts: community.network.slxos_facts
+  slxos_interface: community.network.slxos_interface
+  slxos_l2_interface: community.network.slxos_l2_interface
+  slxos_l3_interface: community.network.slxos_l3_interface
+  slxos_linkagg: community.network.slxos_linkagg
+  slxos_lldp: community.network.slxos_lldp
+  slxos_vlan: community.network.slxos_vlan
+
+# Community Zabbix Collection
+community_zabbix:
+  # Zabbix management
+  zabbix_action: community.zabbix.zabbix_action
+  zabbix_authentication: community.zabbix.zabbix_authentication
+  zabbix_discovery_rule: community.zabbix.zabbix_discovery_rule
+  zabbix_group: community.zabbix.zabbix_group
+  zabbix_group_info: community.zabbix.zabbix_group_info
+  zabbix_host: community.zabbix.zabbix_host
+  zabbix_host_info: community.zabbix.zabbix_host_info
+  zabbix_hostmacro: community.zabbix.zabbix_hostmacro
+  zabbix_maintenance: community.zabbix.zabbix_maintenance
+  zabbix_map: community.zabbix.zabbix_map
+  zabbix_mediatype: community.zabbix.zabbix_mediatype
+  zabbix_proxy: community.zabbix.zabbix_proxy
+  zabbix_proxy_info: community.zabbix.zabbix_proxy_info
+  zabbix_screen: community.zabbix.zabbix_screen
+  zabbix_service: community.zabbix.zabbix_service
+  zabbix_template: community.zabbix.zabbix_template
+  zabbix_template_info: community.zabbix.zabbix_template_info
+  zabbix_user: community.zabbix.zabbix_user
+  zabbix_user_info: community.zabbix.zabbix_user_info
+  zabbix_usergroup: community.zabbix.zabbix_usergroup
+  zabbix_valuemap: community.zabbix.zabbix_valuemap
+  zabbix_globalmacro: community.zabbix.zabbix_globalmacro
+  zabbix_housekeeping: community.zabbix.zabbix_housekeeping
+  zabbix_script: community.zabbix.zabbix_script
+  zabbix_settings: community.zabbix.zabbix_settings
+
+# Additional Cloud and Infrastructure Collections
+# Amazon AWS Collection
+amazon_aws:
+  # EC2 management
+  ec2_instance: amazon.aws.ec2_instance
+  ec2_instance_info: amazon.aws.ec2_instance_info
+  ec2_ami: amazon.aws.ec2_ami
+  ec2_ami_info: amazon.aws.ec2_ami_info
+  ec2_key: amazon.aws.ec2_key
+  ec2_security_group: amazon.aws.ec2_security_group
+  ec2_security_group_info: amazon.aws.ec2_security_group_info
+  ec2_vpc: amazon.aws.ec2_vpc
+  ec2_vpc_info: amazon.aws.ec2_vpc_info
+  ec2_vpc_subnet: amazon.aws.ec2_vpc_subnet
+  ec2_vpc_subnet_info: amazon.aws.ec2_vpc_subnet_info
+  ec2_vpc_igw: amazon.aws.ec2_vpc_igw
+  ec2_vpc_igw_info: amazon.aws.ec2_vpc_igw_info
+  ec2_vpc_route_table: amazon.aws.ec2_vpc_route_table
+  ec2_vpc_route_table_info: amazon.aws.ec2_vpc_route_table_info
+  ec2_snapshot: amazon.aws.ec2_snapshot
+  ec2_snapshot_info: amazon.aws.ec2_snapshot_info
+  ec2_vol: amazon.aws.ec2_vol
+  ec2_vol_info: amazon.aws.ec2_vol_info
+
+  # S3 management
+  s3_bucket: amazon.aws.s3_bucket
+  s3_bucket_info: amazon.aws.s3_bucket_info
+  s3_object: amazon.aws.s3_object
+  s3_object_info: amazon.aws.s3_object_info
+
+  # IAM management
+  iam_user: amazon.aws.iam_user
+  iam_user_info: amazon.aws.iam_user_info
+  iam_group: amazon.aws.iam_group
+  iam_group_info: amazon.aws.iam_group_info
+  iam_role: amazon.aws.iam_role
+  iam_role_info: amazon.aws.iam_role_info
+  iam_policy: amazon.aws.iam_policy
+  iam_policy_info: amazon.aws.iam_policy_info
+
+  # RDS management
+  rds_instance: amazon.aws.rds_instance
+  rds_instance_info: amazon.aws.rds_instance_info
+  rds_cluster: amazon.aws.rds_cluster
+  rds_cluster_info: amazon.aws.rds_cluster_info
+  rds_subnet_group: amazon.aws.rds_subnet_group
+  rds_subnet_group_info: amazon.aws.rds_subnet_group_info
+
+  # CloudFormation
+  cloudformation: amazon.aws.cloudformation
+  cloudformation_info: amazon.aws.cloudformation_info
+
+  # Auto Scaling
+  autoscaling_group: amazon.aws.autoscaling_group
+  autoscaling_group_info: amazon.aws.autoscaling_group_info
+
+  # Load Balancing
+  elb_application_lb: amazon.aws.elb_application_lb
+  elb_application_lb_info: amazon.aws.elb_application_lb_info
+  elb_classic_lb: amazon.aws.elb_classic_lb
+  elb_classic_lb_info: amazon.aws.elb_classic_lb_info
+  elb_network_lb: amazon.aws.elb_network_lb
+  elb_network_lb_info: amazon.aws.elb_network_lb_info
+
+# Microsoft Azure Collection
+azure_rm:
+  # Virtual Machines
+  azure_rm_virtualmachine: azure.azcollection.azure_rm_virtualmachine
+  azure_rm_virtualmachine_info: azure.azcollection.azure_rm_virtualmachine_info
+  azure_rm_virtualmachineimage_info: azure.azcollection.azure_rm_virtualmachineimage_info
+  azure_rm_virtualmachinescaleset: azure.azcollection.azure_rm_virtualmachinescaleset
+  azure_rm_virtualmachinescaleset_info: azure.azcollection.azure_rm_virtualmachinescaleset_info
+
+  # Resource Groups
+  azure_rm_resourcegroup: azure.azcollection.azure_rm_resourcegroup
+  azure_rm_resourcegroup_info: azure.azcollection.azure_rm_resourcegroup_info
+
+  # Storage
+  azure_rm_storageaccount: azure.azcollection.azure_rm_storageaccount
+  azure_rm_storageaccount_info: azure.azcollection.azure_rm_storageaccount_info
+  azure_rm_storageblob: azure.azcollection.azure_rm_storageblob
+
+  # Networking
+  azure_rm_virtualnetwork: azure.azcollection.azure_rm_virtualnetwork
+  azure_rm_virtualnetwork_info: azure.azcollection.azure_rm_virtualnetwork_info
+  azure_rm_subnet: azure.azcollection.azure_rm_subnet
+  azure_rm_subnet_info: azure.azcollection.azure_rm_subnet_info
+  azure_rm_publicipaddress: azure.azcollection.azure_rm_publicipaddress
+  azure_rm_publicipaddress_info: azure.azcollection.azure_rm_publicipaddress_info
+  azure_rm_networkinterface: azure.azcollection.azure_rm_networkinterface
+  azure_rm_networkinterface_info: azure.azcollection.azure_rm_networkinterface_info
+  azure_rm_securitygroup: azure.azcollection.azure_rm_securitygroup
+  azure_rm_securitygroup_info: azure.azcollection.azure_rm_securitygroup_info
+
+  # Databases
+  azure_rm_sqldatabase: azure.azcollection.azure_rm_sqldatabase
+  azure_rm_sqldatabase_info: azure.azcollection.azure_rm_sqldatabase_info
+  azure_rm_sqlserver: azure.azcollection.azure_rm_sqlserver
+  azure_rm_sqlserver_info: azure.azcollection.azure_rm_sqlserver_info
+
+  # Web Apps
+  azure_rm_webapp: azure.azcollection.azure_rm_webapp
+  azure_rm_webapp_info: azure.azcollection.azure_rm_webapp_info
+
+# Google Cloud Platform Collection
+google_cloud:
+  # Compute Engine
+  gcp_compute_instance: google.cloud.gcp_compute_instance
+  gcp_compute_instance_info: google.cloud.gcp_compute_instance_info
+  gcp_compute_disk: google.cloud.gcp_compute_disk
+  gcp_compute_disk_info: google.cloud.gcp_compute_disk_info
+  gcp_compute_network: google.cloud.gcp_compute_network
+  gcp_compute_network_info: google.cloud.gcp_compute_network_info
+  gcp_compute_subnetwork: google.cloud.gcp_compute_subnetwork
+  gcp_compute_subnetwork_info: google.cloud.gcp_compute_subnetwork_info
+  gcp_compute_firewall: google.cloud.gcp_compute_firewall
+  gcp_compute_firewall_info: google.cloud.gcp_compute_firewall_info
+
+  # Cloud Storage
+  gcp_storage_bucket: google.cloud.gcp_storage_bucket
+  gcp_storage_bucket_info: google.cloud.gcp_storage_bucket_info
+  gcp_storage_object: google.cloud.gcp_storage_object
+  gcp_storage_object_info: google.cloud.gcp_storage_object_info
+
+  # Cloud SQL
+  gcp_sql_instance: google.cloud.gcp_sql_instance
+  gcp_sql_instance_info: google.cloud.gcp_sql_instance_info
+  gcp_sql_database: google.cloud.gcp_sql_database
+  gcp_sql_database_info: google.cloud.gcp_sql_database_info
+
+  # IAM
+  gcp_iam_service_account: google.cloud.gcp_iam_service_account
+  gcp_iam_service_account_info: google.cloud.gcp_iam_service_account_info
+
+# Ansible NetCommon Collection
+ansible_netcommon:
+  # Network utilities
+  cli_command: ansible.netcommon.cli_command
+  cli_config: ansible.netcommon.cli_config
+  net_get: ansible.netcommon.net_get
+  net_put: ansible.netcommon.net_put
+  net_ping: ansible.netcommon.net_ping
+  netconf_get: ansible.netcommon.netconf_get
+  netconf_config: ansible.netcommon.netconf_config
+  netconf_rpc: ansible.netcommon.netconf_rpc
+  restconf_get: ansible.netcommon.restconf_get
+  restconf_config: ansible.netcommon.restconf_config
+  telnet: ansible.netcommon.telnet
+
+# Ansible Utils Collection
+ansible_utils:
+  # Data manipulation utilities
+  fact_diff: ansible.utils.fact_diff
+  index_of: ansible.utils.index_of
+  to_paths: ansible.utils.to_paths
+  from_paths: ansible.utils.from_paths
+  remove_keys: ansible.utils.remove_keys
+  keep_keys: ansible.utils.keep_keys
+  replace_keys: ansible.utils.replace_keys
+  update_fact: ansible.utils.update_fact
+  validate: ansible.utils.validate
+  cli_parse: ansible.utils.cli_parse

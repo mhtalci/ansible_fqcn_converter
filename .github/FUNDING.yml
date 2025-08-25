@@ -1,0 +1,38 @@
+# GitHub Sponsors funding configuration
+# This file is used to display sponsor information on the repository
+
+# GitHub Sponsors
+# github: [username1, username2] # Replace with up to 4 GitHub Sponsors-enabled usernames
+
+# Patreon
+# patreon: username # Replace with a single Patreon username
+
+# Open Collective
+# open_collective: project-name # Replace with a single Open Collective project name
+
+# Ko-fi
+# ko_fi: username # Replace with a single Ko-fi username
+
+# Tidelift
+# tidelift: pypi/package-name # Replace with a single Tidelift package name
+
+# Community Bridge
+# community_bridge: project-name # Replace with a single Community Bridge project name
+
+# Liberapay
+# liberapay: username # Replace with a single Liberapay username
+
+# IssueHunt
+# issuehunt: username # Replace with a single IssueHunt username
+
+# Other funding sources
+# custom: ['https://example.com', 'https://example2.com'] # Replace with up to 4 custom sponsorship URLs
+
+# Note: This file is currently configured as a template.
+# Uncomment and configure the appropriate funding sources when ready to accept sponsorship.
+# 
+# For now, the best way to support the project is through:
+# - Contributing code, documentation, or testing
+# - Reporting bugs and suggesting improvements  
+# - Helping other users in discussions and issues
+# - Spreading the word about the project

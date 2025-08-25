@@ -1,0 +1,41 @@
+[run]
+source = src/fqcn_converter
+omit = 
+    */tests/*
+    */test_*
+    */_version.py
+    */conftest.py
+    */setup.py
+branch = True
+parallel = True
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if self.debug:
+    if settings.DEBUG
+    raise AssertionError
+    raise NotImplementedError
+    if 0:
+    if __name__ == .__main__.:
+    class .*\bProtocol\):
+    @(abc\.)?abstractmethod
+    # Type checking imports
+    if TYPE_CHECKING:
+    # Defensive assertions
+    assert False
+    # Platform specific code
+    if sys.platform
+
+show_missing = True
+precision = 2
+skip_covered = False
+skip_empty = False
+
+[html]
+directory = htmlcov
+title = FQCN Converter Coverage Report
+
+[xml]
+output = coverage.xml

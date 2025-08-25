@@ -1,0 +1,75 @@
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.1.0"
+tag_format = "v$version"
+version_files = [
+    "src/fqcn_converter/_version.py:__version__",
+    "pyproject.toml:version"
+]
+bump_message = "bump: version $current_version → $new_version"
+update_changelog_on_bump = true
+changelog_file = "CHANGELOG.md"
+changelog_format = "## $version ($date)"
+changelog_incremental = true
+
+[tool.commitizen.customize]
+message_template = "{{change_type}}{{scope}}: {{message}}"
+example = "feat(parser): add ability to parse arrays"
+schema = """
+<type>(<scope>): <subject>
+<BLANK LINE>
+<body>
+<BLANK LINE>
+<footer>
+"""
+schema_pattern = "^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\\(.+\\))?: .{1,50}"
+
+[[tool.commitizen.customize.questions]]
+type = "list"
+name = "change_type"
+choices = [
+    {value = "feat", name = "feat: A new feature"},
+    {value = "fix", name = "fix: A bug fix"},
+    {value = "docs", name = "docs: Documentation only changes"},
+    {value = "style", name = "style: Changes that do not affect the meaning of the code"},
+    {value = "refactor", name = "refactor: A code change that neither fixes a bug nor adds a feature"},
+    {value = "perf", name = "perf: A code change that improves performance"},
+    {value = "test", name = "test: Adding missing tests or correcting existing tests"},
+    {value = "build", name = "build: Changes that affect the build system or external dependencies"},
+    {value = "ci", name = "ci: Changes to our CI configuration files and scripts"},
+    {value = "chore", name = "chore: Other changes that don't modify src or test files"},
+    {value = "revert", name = "revert: Reverts a previous commit"}
+]
+message = "Select the type of change that you're committing"
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "scope"
+message = "What is the scope of this change? (class or file name): (press [enter] to skip)"
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "message"
+message = "Write a short, imperative tense description of the change"
+
+[[tool.commitizen.customize.questions]]
+type = "confirm"
+name = "is_breaking_change"
+message = "Is this a BREAKING CHANGE? Correlates with MAJOR in SemVer"
+default = false
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "breaking_change_content"
+message = "Describe the breaking change"
+when = "{{ answers.is_breaking_change }}"
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "body"
+message = "Provide additional contextual information about the code changes: (press [enter] to skip)"
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "footer"
+message = "Information about Breaking Changes and reference issues that this commit closes: (press [enter] to skip)"

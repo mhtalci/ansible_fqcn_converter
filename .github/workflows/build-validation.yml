@@ -1,0 +1,305 @@
+name: Build Validation
+
+"on":
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build-source:
+    name: Build Source Distribution
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: 'pip'
+
+      - name: Install build tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine check-manifest
+
+      - name: Validate manifest
+        run: |
+          check-manifest --verbose
+
+      - name: Build source distribution
+        run: |
+          python -m build --sdist
+
+      - name: Validate source distribution
+        run: |
+          twine check dist/*.tar.gz
+
+      - name: Test source distribution contents
+        run: |
+          cd dist
+          tar -tzf *.tar.gz | head -20
+          echo "Source distribution created successfully"
+
+      - name: Upload source distribution
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-distribution
+          path: dist/*.tar.gz
+
+  build-wheel:
+    name: Build Wheel Distribution
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install build tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+
+      - name: Build wheel distribution
+        run: |
+          python -m build --wheel
+
+      - name: Validate wheel distribution
+        run: |
+          twine check dist/*.whl
+
+      - name: Upload wheel distribution
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheel-${{ matrix.os }}-py${{ matrix.python-version }}
+          path: dist/*.whl
+
+  installation-test:
+    name: Installation Testing
+    runs-on: ${{ matrix.os }}
+    needs: [build-source, build-wheel]
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        install-method: [wheel, source]
+
+    steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Download distributions
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*distribution*"
+          merge-multiple: true
+          path: dist/
+
+      - name: Install from wheel
+        if: matrix.install-method == 'wheel'
+        run: |
+          pip install dist/*.whl
+
+      - name: Install from source
+        if: matrix.install-method == 'source'
+        run: |
+          pip install dist/*.tar.gz
+
+      - name: Test basic import
+        run: |
+          python -c "
+          import fqcn_converter
+          print(f'Successfully imported fqcn_converter version: {fqcn_converter.__version__}')
+          "
+
+      - name: Test CLI availability
+        run: |
+          fqcn-converter --help
+          fqcn-batch-converter --help
+          fqcn-validator --help
+
+      - name: Test package functionality
+        run: |
+          python -c "
+          from fqcn_converter.core.converter import FQCNConverter
+          from fqcn_converter.core.validator import ValidationEngine
+          from fqcn_converter.config.manager import ConfigurationManager
+          
+          # Test basic instantiation
+          converter = FQCNConverter()
+          validator = ValidationEngine()
+          config_manager = ConfigurationManager()
+          
+          print('✅ All core classes can be instantiated')
+          "
+
+  package-integrity:
+    name: Package Integrity Check
+    runs-on: ubuntu-latest
+    needs: [build-source, build-wheel]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: 'pip'
+
+      - name: Install analysis tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install pkginfo wheel-inspect
+
+      - name: Download all distributions
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*distribution*"
+          merge-multiple: true
+          path: dist/
+
+      - name: Analyze source distribution
+        run: |
+          python -c "
+          import pkginfo
+          import os
+          
+          for file in os.listdir('dist'):
+              if file.endswith('.tar.gz'):
+                  info = pkginfo.SDist(f'dist/{file}')
+                  print(f'Source Distribution: {file}')
+                  print(f'  Name: {info.name}')
+                  print(f'  Version: {info.version}')
+                  print(f'  Author: {info.author}')
+                  print(f'  License: {info.license}')
+                  print(f'  Description: {info.summary}')
+                  break
+          "
+
+      - name: Analyze wheel distribution
+        run: |
+          python -c "
+          import pkginfo
+          import os
+          
+          for file in os.listdir('dist'):
+              if file.endswith('.whl'):
+                  info = pkginfo.Wheel(f'dist/{file}')
+                  print(f'Wheel Distribution: {file}')
+                  print(f'  Name: {info.name}')
+                  print(f'  Version: {info.version}')
+                  print(f'  Python requires: {info.requires_python}')
+                  print(f'  Platform: {info.platform}')
+                  break
+          "
+
+      - name: Check package size
+        run: |
+          echo "## 📦 Package Size Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Distribution | Size |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------------|------|" >> $GITHUB_STEP_SUMMARY
+          
+          for file in dist/*; do
+            if [ -f "$file" ]; then
+              size=$(du -h "$file" | cut -f1)
+              basename=$(basename "$file")
+              echo "| $basename | $size |" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+
+  compatibility-test:
+    name: Compatibility Testing
+    runs-on: ubuntu-latest
+    needs: [installation-test]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: 'pip'
+
+      - name: Download wheel distribution
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "wheel-ubuntu-latest-py3.11"
+          path: dist/
+
+      - name: Install package
+        run: |
+          pip install dist/*/*.whl
+
+      - name: Test with different Ansible versions
+        run: |
+          # Test with minimum supported Ansible version
+          pip install "ansible-core>=2.12,<2.13"
+          python -c "
+          import ansible
+          import fqcn_converter
+          print(f'Testing with Ansible {ansible.__version__}')
+          print('✅ Compatible with minimum Ansible version')
+          "
+          
+          pip uninstall -y ansible-core
+          
+          # Test with latest Ansible version
+          pip install ansible-core
+          python -c "
+          import ansible
+          import fqcn_converter
+          print(f'Testing with Ansible {ansible.__version__}')
+          print('✅ Compatible with latest Ansible version')
+          "
+
+  build-summary:
+    name: Build Summary
+    runs-on: ubuntu-latest
+    needs: [build-source, build-wheel, installation-test, package-integrity, compatibility-test]
+    if: always()
+
+    steps:
+      - name: Generate build summary
+        run: |
+          echo "## 🏗️ Build Validation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Status | Description |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|-------------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Source Build | ${{ needs.build-source.result == 'success' && '✅ Passed' || '❌ Failed' }} | Source distribution (.tar.gz) creation |" >> $GITHUB_STEP_SUMMARY
+          echo "| Wheel Build | ${{ needs.build-wheel.result == 'success' && '✅ Passed' || '❌ Failed' }} | Wheel distribution (.whl) creation |" >> $GITHUB_STEP_SUMMARY
+          echo "| Installation Test | ${{ needs.installation-test.result == 'success' && '✅ Passed' || '❌ Failed' }} | Package installation in clean environments |" >> $GITHUB_STEP_SUMMARY
+          echo "| Package Integrity | ${{ needs.package-integrity.result == 'success' && '✅ Passed' || '❌ Failed' }} | Distribution metadata and structure validation |" >> $GITHUB_STEP_SUMMARY
+          echo "| Compatibility Test | ${{ needs.compatibility-test.result == 'success' && '✅ Passed' || '❌ Failed' }} | Cross-version compatibility validation |" >> $GITHUB_STEP_SUMMARY
+
+      - name: Fail if any build validation failed
+        if: needs.build-source.result != 'success' || needs.build-wheel.result != 'success' || needs.installation-test.result != 'success' || needs.package-integrity.result != 'success' || needs.compatibility-test.result != 'success'
+        run: |
+          echo "❌ Build validation failed!"
+          echo "One or more build validation steps did not complete successfully."
+          exit 1
+
+      - name: Success message
+        if: needs.build-source.result == 'success' && needs.build-wheel.result == 'success' && needs.installation-test.result == 'success' && needs.package-integrity.result == 'success' && needs.compatibility-test.result == 'success'
+        run: |
+          echo "✅ All build validation checks passed!"
+          echo "Package is ready for distribution."

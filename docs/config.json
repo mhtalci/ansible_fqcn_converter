@@ -1,0 +1,94 @@
+{
+  "site": {
+    "name": "Ansible FQCN Converter Documentation",
+    "description": "Complete documentation for the Ansible FQCN Converter tool",
+    "version": "0.1.0",
+    "repository": "https://github.com/org/ansible-fqcn-converter",
+    "base_url": "https://org.github.io/ansible-fqcn-converter"
+  },
+  "versions": [
+    {
+      "version": "0.1.0",
+      "title": "Initial Release",
+      "path": "/",
+      "default": true,
+      "status": "stable"
+    }
+  ],
+  "navigation": [
+    {
+      "title": "Home",
+      "path": "/",
+      "icon": "🏠"
+    },
+    {
+      "title": "User Guide",
+      "children": [
+        {
+          "title": "Installation",
+          "path": "/installation.html",
+          "icon": "📦"
+        },
+        {
+          "title": "Quick Start",
+          "path": "/quick-start.html",
+          "icon": "🚀"
+        },
+        {
+          "title": "CLI Reference",
+          "path": "/cli.html",
+          "icon": "💻"
+        },
+        {
+          "title": "API Reference",
+          "path": "/api.html",
+          "icon": "🔧"
+        }
+      ]
+    },
+    {
+      "title": "Examples",
+      "children": [
+        {
+          "title": "Usage Examples",
+          "path": "/examples.html",
+          "icon": "📝"
+        },
+        {
+          "title": "Troubleshooting",
+          "path": "/troubleshooting.html",
+          "icon": "🔍"
+        }
+      ]
+    }
+  ],
+  "context7": {
+    "enabled": true,
+    "auto_regenerate": true,
+    "api_docs": {
+      "source": "src/fqcn_converter",
+      "output": "docs/reference/api",
+      "format": "markdown"
+    },
+    "cli_docs": {
+      "source": "src/fqcn_converter/cli",
+      "output": "docs/usage",
+      "format": "markdown"
+    }
+  },
+  "deployment": {
+    "provider": "github-pages",
+    "branch": "gh-pages",
+    "auto_deploy": true,
+    "custom_domain": null,
+    "ssl": true
+  },
+  "features": {
+    "search": true,
+    "syntax_highlighting": true,
+    "responsive_design": true,
+    "dark_mode": false,
+    "version_switcher": true,
+    "edit_on_github": true
+  }
+}

@@ -1,0 +1,795 @@
+{
+  "title": "FQCN Converter CLI Reference",
+  "description": "Complete command-line interface reference for the Ansible FQCN Converter",
+  "version": "0.1.0",
+  "main_command": {
+    "name": "fqcn-converter",
+    "description": "Convert Ansible playbooks and roles to use Fully Qualified Collection Names (FQCN)",
+    "help_text": "usage: fqcn-converter [-h] [--version] [--quiet | --verbose | --debug] {convert,validate,batch} ...\n\nConvert Ansible playbooks and roles to use Fully Qualified Collection Names (FQCN)\n\noptions:\n  -h, --help            show this help message and exit\n  --version             show program's version number and exit\n  --quiet, -q           Suppress all output except errors\n  --verbose, -v         Enable verbose output with debug information\n  --debug               Enable debug output (same as --verbose)\n\nCommands:\n  Available commands for FQCN conversion\n\n  {convert,validate,batch}\n                        Use \"fqcn-converter <command> --help\" for command-specific help\n    convert             Convert Ansible files to use FQCN\n    validate            Validate FQCN conversion results\n    batch               Batch process multiple Ansible projects\n\nExamples:\n  # Convert a single file\n  fqcn-converter convert playbook.yml\n  \n  # Dry run to preview changes\n  fqcn-converter convert --dry-run playbook.yml\n  \n  # Validate converted files\n  fqcn-converter validate roles/\n  \n  # Batch convert multiple projects\n  fqcn-converter batch /path/to/ansible/projects\n  \n  # Use custom mapping configuration\n  fqcn-converter convert --config custom_mappings.yml playbook.yml\n\nFor more help on specific commands, use:\n  fqcn-converter <command> --help\n        \n",
+    "global_options": [
+      {
+        "flags": [
+          "--version"
+        ],
+        "dest": "version",
+        "help": "show program's version number and exit",
+        "type": "str",
+        "default": "==SUPPRESS==",
+        "choices": null,
+        "required": false
+      },
+      {
+        "flags": [
+          "--quiet",
+          "-q"
+        ],
+        "dest": "verbosity",
+        "help": "Suppress all output except errors",
+        "type": "str",
+        "default": "normal",
+        "choices": null,
+        "required": false
+      },
+      {
+        "flags": [
+          "--verbose",
+          "-v"
+        ],
+        "dest": "verbosity",
+        "help": "Enable verbose output with debug information",
+        "type": "str",
+        "default": "normal",
+        "choices": null,
+        "required": false
+      },
+      {
+        "flags": [
+          "--debug"
+        ],
+        "dest": "verbosity",
+        "help": "Enable debug output (same as --verbose)",
+        "type": "str",
+        "default": "normal",
+        "choices": null,
+        "required": false
+      }
+    ],
+    "subcommands_list": [
+      "convert",
+      "validate",
+      "batch"
+    ],
+    "usage": "fqcn-converter [global-options] <command> [command-options] [arguments]",
+    "examples": [
+      {
+        "description": "Show help for main command",
+        "command": "fqcn-converter --help"
+      },
+      {
+        "description": "Show version information",
+        "command": "fqcn-converter --version"
+      },
+      {
+        "description": "Convert with verbose output",
+        "command": "fqcn-converter --verbose convert playbook.yml"
+      }
+    ]
+  },
+  "subcommands": {
+    "convert": {
+      "name": "convert",
+      "description": "Convert Ansible playbooks, roles, and tasks to use Fully Qualified Collection Names",
+      "help_text": "usage: fqcn-converter convert [-h] [--config CONFIG] [--dry-run] [--backup] [--no-backup] [--progress] [--report REPORT] [--skip-validation] [--lint] [--force] [--exclude EXCLUDE] files [files ...]\n\nConvert Ansible playbooks, roles, and tasks to use Fully Qualified Collection Names\n\npositional arguments:\n  files                Ansible files or directories to convert\n\noptions:\n  -h, --help           show this help message and exit\n  --config, -c CONFIG  Path to custom FQCN mapping configuration file\n  --dry-run, -n        Show what would be converted without making changes\n  --backup, -b         Create backup files before conversion\n  --no-backup          Skip creating backup files (overrides default backup behavior)\n  --progress           Show progress bar for large operations\n  --report REPORT      Generate detailed conversion report to specified file\n  --skip-validation    Skip YAML syntax validation after conversion\n  --lint               Run ansible-lint validation after conversion\n  --force              Force conversion even if files appear already converted\n  --exclude EXCLUDE    Exclude files/directories matching pattern (can be used multiple times)\n\nExamples:\n  # Convert a single file\n  fqcn-converter convert playbook.yml\n  \n  # Convert with dry run\n  fqcn-converter convert --dry-run roles/nginx/tasks/main.yml\n  \n  # Convert with custom configuration\n  fqcn-converter convert --config custom_mappings.yml playbook.yml\n  \n  # Convert and create backup\n  fqcn-converter convert --backup playbook.yml\n        \n",
+      "usage": "fqcn-converter convert [options] [arguments]",
+      "options": [
+        {
+          "flags": [
+            "-h",
+            "--help"
+          ],
+          "dest": "help",
+          "help": "show this help message and exit",
+          "type": "str",
+          "default": "==SUPPRESS==",
+          "choices": null,
+          "required": false,
+          "action": "_HelpAction"
+        },
+        {
+          "name": "files",
+          "help": "Ansible files or directories to convert",
+          "nargs": "+",
+          "type": "str",
+          "positional": true
+        },
+        {
+          "flags": [
+            "--config",
+            "-c"
+          ],
+          "dest": "config",
+          "help": "Path to custom FQCN mapping configuration file",
+          "type": "str",
+          "default": null,
+          "choices": null,
+          "required": false,
+          "action": "_StoreAction"
+        },
+        {
+          "flags": [
+            "--dry-run",
+            "-n"
+          ],
+          "dest": "dry_run",
+          "help": "Show what would be converted without making changes",
+          "type": "str",
+          "default": false,
+          "choices": null,
+          "required": false,
+          "action": "_StoreTrueAction"
+        },
+        {
+          "flags": [
+            "--backup",
+            "-b"
+          ],
+          "dest": "backup",
+          "help": "Create backup files before conversion",
+          "type": "str",
+          "default": false,
+          "choices": null,
+          "required": false,
+          "action": "_StoreTrueAction"
+        },
+        {
+          "flags": [
+            "--no-backup"
+          ],
+          "dest": "no_backup",
+          "help": "Skip creating backup files (overrides default backup behavior)",
+          "type": "str",
+          "default": false,
+          "choices": null,
+          "required": false,
+          "action": "_StoreTrueAction"
+        },
+        {
+          "flags": [
+            "--progress"
+          ],
+          "dest": "progress",
+          "help": "Show progress bar for large operations",
+          "type": "str",
+          "default": false,
+          "choices": null,
+          "required": false,
+          "action": "_StoreTrueAction"
+        },
+        {
+          "flags": [
+            "--report"
+          ],
+          "dest": "report",
+          "help": "Generate detailed conversion report to specified file",
+          "type": "str",
+          "default": null,
+          "choices": null,
+          "required": false,
+          "action": "_StoreAction"
+        },
+        {
+          "flags": [
+            "--skip-validation"
+          ],
+          "dest": "skip_validation",
+          "help": "Skip YAML syntax validation after conversion",
+          "type": "str",
+          "default": false,
+          "choices": null,
+          "required": false,
+          "action": "_StoreTrueAction"
+        },
+        {
+          "flags": [
+            "--lint"
+          ],
+          "dest": "lint",
+          "help": "Run ansible-lint validation after conversion",
+          "type": "str",
+          "default": false,
+          "choices": null,
+          "required": false,
+          "action": "_StoreTrueAction"
+        },
+        {
+          "flags": [
+            "--force"
+          ],
+          "dest": "force",
+          "help": "Force conversion even if files appear already converted",
+          "type": "str",
+          "default": false,
+          "choices": null,
+          "required": false,
+          "action": "_StoreTrueAction"
+        },
+        {
+          "flags": [
+            "--exclude"
+          ],
+          "dest": "exclude",
+          "help": "Exclude files/directories matching pattern (can be used multiple times)",
+          "type": "str",
+          "default": null,
+          "choices": null,
+          "required": false,
+          "action": "_AppendAction"
+        }
+      ],
+      "examples": [
+        {
+          "description": "Convert a single playbook",
+          "command": "fqcn-converter convert playbook.yml",
+          "explanation": "Converts all short module names in playbook.yml to FQCN format"
+        },
+        {
+          "description": "Dry run conversion to preview changes",
+          "command": "fqcn-converter convert --dry-run playbook.yml",
+          "explanation": "Shows what changes would be made without modifying files"
+        },
+        {
+          "description": "Convert with custom configuration",
+          "command": "fqcn-converter convert --config custom_mappings.yml playbook.yml",
+          "explanation": "Uses custom FQCN mappings from configuration file"
+        },
+        {
+          "description": "Convert directory with backup",
+          "command": "fqcn-converter convert --backup roles/",
+          "explanation": "Converts all Ansible files in roles/ directory and creates backups"
+        },
+        {
+          "description": "Convert with progress reporting",
+          "command": "fqcn-converter convert --progress --report report.json roles/",
+          "explanation": "Shows progress and generates detailed conversion report"
+        }
+      ],
+      "common_use_cases": [
+        {
+          "title": "Migrating Legacy Playbooks",
+          "description": "Convert existing Ansible playbooks to use FQCN format for Ansible 2.10+ compatibility",
+          "workflow": "1. Backup files, 2. Run dry-run, 3. Convert with validation, 4. Test playbooks"
+        },
+        {
+          "title": "CI/CD Integration",
+          "description": "Integrate FQCN conversion into CI/CD pipelines for automated compliance",
+          "workflow": "1. Add pre-commit hook, 2. Run in CI validation, 3. Generate reports"
+        },
+        {
+          "title": "Large-Scale Conversion",
+          "description": "Convert multiple Ansible projects across an organization",
+          "workflow": "1. Use batch command, 2. Parallel processing, 3. Centralized reporting"
+        }
+      ]
+    },
+    "validate": {
+      "name": "validate",
+      "description": "Validate that Ansible files have been properly converted to use FQCN",
+      "help_text": "usage: fqcn-converter validate [-h] [--strict] [--score] [--lint] [--report REPORT] [--format {text,json,junit}] [--exclude EXCLUDE] [--include-warnings] [--parallel] [--workers WORKERS] [files ...]\n\nValidate that Ansible files have been properly converted to use FQCN\n\npositional arguments:\n  files                 Ansible files or directories to validate (default: current directory)\n\noptions:\n  -h, --help            show this help message and exit\n  --strict              Use strict validation mode with enhanced checks\n  --score               Calculate and display FQCN conversion completeness score\n  --lint                Run ansible-lint validation in addition to FQCN checks\n  --report REPORT       Generate detailed validation report to specified file\n  --format {text,json,junit}\n                        Output format for validation results (default: text)\n  --exclude EXCLUDE     Exclude files/directories matching pattern (can be used multiple times)\n  --include-warnings    Include warnings in validation results\n  --parallel            Enable parallel validation for multiple files\n  --workers WORKERS     Number of parallel workers for validation (default: 4)\n\nExamples:\n  # Validate a single file\n  fqcn-converter validate playbook.yml\n  \n  # Validate all files in directory\n  fqcn-converter validate roles/\n  \n  # Generate validation report\n  fqcn-converter validate --report validation_report.json roles/\n        \n",
+      "usage": "fqcn-converter validate [options] [arguments]",
+      "options": [
+        {
+          "flags": [
+            "-h",
+            "--help"
+          ],
+          "dest": "help",
+          "help": "show this help message and exit",
+          "type": "str",
+          "default": "==SUPPRESS==",
+          "choices": null,
+          "required": false,
+          "action": "_HelpAction"
+        },
+        {
+          "name": "files",
+          "help": "Ansible files or directories to validate (default: current directory)",
+          "nargs": "*",
+          "type": "str",
+          "positional": true
+        },
+        {
+          "flags": [
+            "--strict"
+          ],
+          "dest": "strict",
+          "help": "Use strict validation mode with enhanced checks",
+          "type": "str",
+          "default": false,
+          "choices": null,
+          "required": false,
+          "action": "_StoreTrueAction"
+        },
+        {
+          "flags": [
+            "--score"
+          ],
+          "dest": "score",
+          "help": "Calculate and display FQCN conversion completeness score",
+          "type": "str",
+          "default": false,
+          "choices": null,
+          "required": false,
+          "action": "_StoreTrueAction"
+        },
+        {
+          "flags": [
+            "--lint"
+          ],
+          "dest": "lint",
+          "help": "Run ansible-lint validation in addition to FQCN checks",
+          "type": "str",
+          "default": false,
+          "choices": null,
+          "required": false,
+          "action": "_StoreTrueAction"
+        },
+        {
+          "flags": [
+            "--report"
+          ],
+          "dest": "report",
+          "help": "Generate detailed validation report to specified file",
+          "type": "str",
+          "default": null,
+          "choices": null,
+          "required": false,
+          "action": "_StoreAction"
+        },
+        {
+          "flags": [
+            "--format"
+          ],
+          "dest": "format",
+          "help": "Output format for validation results (default: text)",
+          "type": "str",
+          "default": "text",
+          "choices": [
+            "text",
+            "json",
+            "junit"
+          ],
+          "required": false,
+          "action": "_StoreAction"
+        },
+        {
+          "flags": [
+            "--exclude"
+          ],
+          "dest": "exclude",
+          "help": "Exclude files/directories matching pattern (can be used multiple times)",
+          "type": "str",
+          "default": null,
+          "choices": null,
+          "required": false,
+          "action": "_AppendAction"
+        },
+        {
+          "flags": [
+            "--include-warnings"
+          ],
+          "dest": "include_warnings",
+          "help": "Include warnings in validation results",
+          "type": "str",
+          "default": false,
+          "choices": null,
+          "required": false,
+          "action": "_StoreTrueAction"
+        },
+        {
+          "flags": [
+            "--parallel"
+          ],
+          "dest": "parallel",
+          "help": "Enable parallel validation for multiple files",
+          "type": "str",
+          "default": false,
+          "choices": null,
+          "required": false,
+          "action": "_StoreTrueAction"
+        },
+        {
+          "flags": [
+            "--workers"
+          ],
+          "dest": "workers",
+          "help": "Number of parallel workers for validation (default: 4)",
+          "type": "<class 'int'>",
+          "default": 4,
+          "choices": null,
+          "required": false,
+          "action": "_StoreAction"
+        }
+      ],
+      "examples": [
+        {
+          "description": "Validate a single file",
+          "command": "fqcn-converter validate playbook.yml",
+          "explanation": "Checks if playbook.yml properly uses FQCN format"
+        },
+        {
+          "description": "Validate with scoring",
+          "command": "fqcn-converter validate --score roles/",
+          "explanation": "Validates files and shows FQCN compliance scores"
+        },
+        {
+          "description": "Validate with ansible-lint",
+          "command": "fqcn-converter validate --lint --include-warnings playbook.yml",
+          "explanation": "Runs both FQCN validation and ansible-lint checks"
+        },
+        {
+          "description": "Generate validation report",
+          "command": "fqcn-converter validate --report validation.json --format json roles/",
+          "explanation": "Creates detailed JSON validation report"
+        },
+        {
+          "description": "Parallel validation",
+          "command": "fqcn-converter validate --parallel --workers 8 /path/to/projects",
+          "explanation": "Validates multiple files in parallel for faster processing"
+        }
+      ],
+      "common_use_cases": [
+        {
+          "title": "Compliance Checking",
+          "description": "Ensure Ansible code meets FQCN compliance standards",
+          "workflow": "1. Run validation, 2. Check scores, 3. Fix issues, 4. Re-validate"
+        },
+        {
+          "title": "Quality Gates",
+          "description": "Use validation in CI/CD as quality gates before deployment",
+          "workflow": "1. Validate on PR, 2. Block merge if failed, 3. Generate reports"
+        },
+        {
+          "title": "Migration Progress Tracking",
+          "description": "Track progress of FQCN migration across projects",
+          "workflow": "1. Baseline validation, 2. Regular scoring, 3. Progress reporting"
+        }
+      ]
+    },
+    "batch": {
+      "name": "batch",
+      "description": "Discover and convert multiple Ansible projects in parallel",
+      "help_text": "usage: fqcn-converter batch [-h] [--projects PROJECTS [PROJECTS ...]] [--discover-only] [--config CONFIG] [--workers WORKERS] [--dry-run] [--continue-on-error] [--patterns PATTERNS [PATTERNS ...]]\n                            [--exclude EXCLUDE] [--max-depth MAX_DEPTH] [--report REPORT] [--summary-only] [--validate] [--lint]\n                            [root_directory]\n\nDiscover and convert multiple Ansible projects in parallel\n\npositional arguments:\n  root_directory        Root directory to discover Ansible projects\n\noptions:\n  -h, --help            show this help message and exit\n  --projects PROJECTS [PROJECTS ...]\n                        Specific project directories to convert (alternative to root_directory)\n  --discover-only       Only discover projects without converting them\n  --config, -c CONFIG   Path to custom FQCN mapping configuration file\n  --workers, -w WORKERS\n                        Number of parallel workers for batch processing (default: 4)\n  --dry-run, -n         Show what would be converted without making changes\n  --continue-on-error   Continue processing other projects if one fails\n  --patterns PATTERNS [PATTERNS ...]\n                        Custom patterns to identify Ansible projects\n  --exclude EXCLUDE     Exclude directories matching pattern (can be used multiple times)\n  --max-depth MAX_DEPTH\n                        Maximum directory depth for project discovery (default: 5)\n  --report, -r REPORT   Generate detailed batch processing report to specified file\n  --summary-only        Show only summary statistics, not individual project details\n  --validate            Validate converted files after batch processing\n  --lint                Run ansible-lint validation after conversion\n\nExamples:\n  # Discover and convert all projects\n  fqcn-converter batch /path/to/ansible/projects\n  \n  # Batch convert with 8 workers\n  fqcn-converter batch --workers 8 /path/to/projects\n  \n  # Generate batch report\n  fqcn-converter batch --report batch_report.json /path/to/projects\n        \n",
+      "usage": "fqcn-converter batch [options] [arguments]",
+      "options": [
+        {
+          "flags": [
+            "-h",
+            "--help"
+          ],
+          "dest": "help",
+          "help": "show this help message and exit",
+          "type": "str",
+          "default": "==SUPPRESS==",
+          "choices": null,
+          "required": false,
+          "action": "_HelpAction"
+        },
+        {
+          "name": "root_directory",
+          "help": "Root directory to discover Ansible projects",
+          "nargs": "?",
+          "type": "str",
+          "positional": true
+        },
+        {
+          "flags": [
+            "--projects"
+          ],
+          "dest": "projects",
+          "help": "Specific project directories to convert (alternative to root_directory)",
+          "type": "str",
+          "default": null,
+          "choices": null,
+          "required": false,
+          "action": "_StoreAction"
+        },
+        {
+          "flags": [
+            "--discover-only"
+          ],
+          "dest": "discover_only",
+          "help": "Only discover projects without converting them",
+          "type": "str",
+          "default": false,
+          "choices": null,
+          "required": false,
+          "action": "_StoreTrueAction"
+        },
+        {
+          "flags": [
+            "--config",
+            "-c"
+          ],
+          "dest": "config",
+          "help": "Path to custom FQCN mapping configuration file",
+          "type": "str",
+          "default": null,
+          "choices": null,
+          "required": false,
+          "action": "_StoreAction"
+        },
+        {
+          "flags": [
+            "--workers",
+            "-w"
+          ],
+          "dest": "workers",
+          "help": "Number of parallel workers for batch processing (default: 4)",
+          "type": "<class 'int'>",
+          "default": 4,
+          "choices": null,
+          "required": false,
+          "action": "_StoreAction"
+        },
+        {
+          "flags": [
+            "--dry-run",
+            "-n"
+          ],
+          "dest": "dry_run",
+          "help": "Show what would be converted without making changes",
+          "type": "str",
+          "default": false,
+          "choices": null,
+          "required": false,
+          "action": "_StoreTrueAction"
+        },
+        {
+          "flags": [
+            "--continue-on-error"
+          ],
+          "dest": "continue_on_error",
+          "help": "Continue processing other projects if one fails",
+          "type": "str",
+          "default": false,
+          "choices": null,
+          "required": false,
+          "action": "_StoreTrueAction"
+        },
+        {
+          "flags": [
+            "--patterns"
+          ],
+          "dest": "patterns",
+          "help": "Custom patterns to identify Ansible projects",
+          "type": "str",
+          "default": null,
+          "choices": null,
+          "required": false,
+          "action": "_StoreAction"
+        },
+        {
+          "flags": [
+            "--exclude"
+          ],
+          "dest": "exclude",
+          "help": "Exclude directories matching pattern (can be used multiple times)",
+          "type": "str",
+          "default": null,
+          "choices": null,
+          "required": false,
+          "action": "_AppendAction"
+        },
+        {
+          "flags": [
+            "--max-depth"
+          ],
+          "dest": "max_depth",
+          "help": "Maximum directory depth for project discovery (default: 5)",
+          "type": "<class 'int'>",
+          "default": 5,
+          "choices": null,
+          "required": false,
+          "action": "_StoreAction"
+        },
+        {
+          "flags": [
+            "--report",
+            "-r"
+          ],
+          "dest": "report",
+          "help": "Generate detailed batch processing report to specified file",
+          "type": "str",
+          "default": null,
+          "choices": null,
+          "required": false,
+          "action": "_StoreAction"
+        },
+        {
+          "flags": [
+            "--summary-only"
+          ],
+          "dest": "summary_only",
+          "help": "Show only summary statistics, not individual project details",
+          "type": "str",
+          "default": false,
+          "choices": null,
+          "required": false,
+          "action": "_StoreTrueAction"
+        },
+        {
+          "flags": [
+            "--validate"
+          ],
+          "dest": "validate",
+          "help": "Validate converted files after batch processing",
+          "type": "str",
+          "default": false,
+          "choices": null,
+          "required": false,
+          "action": "_StoreTrueAction"
+        },
+        {
+          "flags": [
+            "--lint"
+          ],
+          "dest": "lint",
+          "help": "Run ansible-lint validation after conversion",
+          "type": "str",
+          "default": false,
+          "choices": null,
+          "required": false,
+          "action": "_StoreTrueAction"
+        }
+      ],
+      "examples": [
+        {
+          "description": "Batch convert multiple projects",
+          "command": "fqcn-converter batch /path/to/ansible/projects",
+          "explanation": "Discovers and converts all Ansible projects in the directory"
+        },
+        {
+          "description": "Batch convert with custom workers",
+          "command": "fqcn-converter batch --workers 8 /path/to/projects",
+          "explanation": "Uses 8 parallel workers for faster batch processing"
+        },
+        {
+          "description": "Batch dry run with report",
+          "command": "fqcn-converter batch --dry-run --report batch_report.json /path/to/projects",
+          "explanation": "Previews batch conversion and generates detailed report"
+        }
+      ],
+      "common_use_cases": [
+        {
+          "title": "Organization-wide Migration",
+          "description": "Convert all Ansible projects across multiple teams",
+          "workflow": "1. Discover projects, 2. Batch convert, 3. Validate results, 4. Report status"
+        },
+        {
+          "title": "Continuous Compliance",
+          "description": "Regularly check and convert new Ansible content",
+          "workflow": "1. Scheduled batch runs, 2. Automated reporting, 3. Alert on issues"
+        }
+      ]
+    }
+  },
+  "usage_examples": [
+    {
+      "category": "Basic Usage",
+      "examples": [
+        {
+          "title": "Convert Single File",
+          "command": "fqcn-converter convert playbook.yml",
+          "description": "Convert a single Ansible playbook to FQCN format",
+          "expected_output": "\u2705 Successfully converted 3 modules in playbook.yml"
+        },
+        {
+          "title": "Validate Conversion",
+          "command": "fqcn-converter validate playbook.yml",
+          "description": "Check if a file properly uses FQCN format",
+          "expected_output": "\u2705 File is compliant (score: 100%)"
+        }
+      ]
+    },
+    {
+      "category": "Advanced Usage",
+      "examples": [
+        {
+          "title": "Batch Processing",
+          "command": "fqcn-converter batch --workers 4 /ansible/projects",
+          "description": "Process multiple projects in parallel",
+          "expected_output": "Processed 15 projects, 12 successful, 3 failed"
+        },
+        {
+          "title": "Custom Configuration",
+          "command": "fqcn-converter convert --config custom.yml --backup roles/",
+          "description": "Use custom mappings and create backups",
+          "expected_output": "Converted 25 files with custom mappings"
+        }
+      ]
+    },
+    {
+      "category": "Reporting and Analysis",
+      "examples": [
+        {
+          "title": "Detailed Reporting",
+          "command": "fqcn-converter validate --score --report report.json --format json .",
+          "description": "Generate comprehensive validation report",
+          "expected_output": "Validation report saved to report.json"
+        },
+        {
+          "title": "Progress Tracking",
+          "command": "fqcn-converter convert --progress --dry-run large_project/",
+          "description": "Preview changes with progress indication",
+          "expected_output": "Processing 150/200 files... Would convert 45 modules"
+        }
+      ]
+    }
+  ],
+  "common_options": {
+    "verbosity": {
+      "options": [
+        "--quiet",
+        "--verbose",
+        "--debug"
+      ],
+      "description": "Control output verbosity level",
+      "usage": "Use --quiet for minimal output, --verbose for detailed information"
+    },
+    "configuration": {
+      "options": [
+        "--config"
+      ],
+      "description": "Specify custom FQCN mapping configuration",
+      "usage": "Point to YAML file with custom module mappings"
+    },
+    "dry_run": {
+      "options": [
+        "--dry-run",
+        "-n"
+      ],
+      "description": "Preview changes without modifying files",
+      "usage": "Always test with dry-run before actual conversion"
+    },
+    "reporting": {
+      "options": [
+        "--report",
+        "--format"
+      ],
+      "description": "Generate detailed operation reports",
+      "usage": "Use for audit trails and compliance documentation"
+    }
+  },
+  "troubleshooting": [
+    {
+      "issue": "Command not found: fqcn-converter",
+      "cause": "Package not installed or not in PATH",
+      "solution": "Install with 'pip install fqcn-converter' or run from project directory"
+    },
+    {
+      "issue": "Permission denied when converting files",
+      "cause": "Insufficient file permissions",
+      "solution": "Check file permissions or run with appropriate user privileges"
+    },
+    {
+      "issue": "YAML parsing errors during conversion",
+      "cause": "Invalid YAML syntax in source files",
+      "solution": "Fix YAML syntax errors before conversion, use --skip-validation to bypass"
+    },
+    {
+      "issue": "No files found to convert",
+      "cause": "No Ansible files detected in specified path",
+      "solution": "Check path contains .yml/.yaml files with Ansible content"
+    },
+    {
+      "issue": "Conversion fails with configuration error",
+      "cause": "Invalid or missing configuration file",
+      "solution": "Verify configuration file format and path, use default if unsure"
+    },
+    {
+      "issue": "Batch processing hangs or is very slow",
+      "cause": "Too many parallel workers or large files",
+      "solution": "Reduce --workers count or process smaller batches"
+    }
+  ]
+}

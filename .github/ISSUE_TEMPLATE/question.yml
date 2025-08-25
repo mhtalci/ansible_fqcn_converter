@@ -1,0 +1,140 @@
+name: Question or Support
+description: Ask a question or get help with using FQCN Converter
+title: "[QUESTION] "
+labels: ["question", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for your question! Please provide as much detail as possible to help us assist you.
+        
+        **Note**: For general discussions, consider using [GitHub Discussions](../../discussions) instead.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Please verify these items before asking your question
+      options:
+        - label: I have read the documentation and FAQ
+          required: true
+        - label: I have searched existing issues and discussions
+          required: true
+        - label: This is not a bug report (use the bug report template instead)
+          required: true
+
+  - type: dropdown
+    id: question-type
+    attributes:
+      label: Question Type
+      description: What type of question is this?
+      options:
+        - Installation and Setup
+        - Usage and Configuration
+        - Best Practices
+        - Troubleshooting
+        - Integration with Other Tools
+        - Performance and Optimization
+        - Development and Contributing
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      description: What would you like to know?
+      placeholder: |
+        Please be as specific as possible. Include:
+        - What you're trying to accomplish
+        - What you've already tried
+        - Where you're getting stuck
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context and Background
+      description: Provide context about your use case and environment
+      placeholder: |
+        Example:
+        - I'm working on converting a large Ansible project with 50+ playbooks
+        - My team uses custom collections and modules
+        - We need to integrate this into our CI/CD pipeline
+
+  - type: textarea
+    id: current-approach
+    attributes:
+      label: What Have You Tried?
+      description: What approaches have you already attempted?
+      placeholder: |
+        Example:
+        - I tried using the CLI with these flags: ...
+        - I looked at the documentation section on: ...
+        - I attempted to configure: ...
+
+  - type: input
+    id: fqcn-version
+    attributes:
+      label: FQCN Converter Version
+      description: What version are you using?
+      placeholder: "0.1.0"
+
+  - type: input
+    id: python-version
+    attributes:
+      label: Python Version
+      description: What version of Python are you using?
+      placeholder: "3.9.0"
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      description: What operating system are you using?
+      options:
+        - Linux
+        - macOS
+        - Windows
+        - Other
+
+  - type: textarea
+    id: configuration
+    attributes:
+      label: Configuration Details
+      description: If relevant, share your configuration or command usage
+      placeholder: |
+        ```yaml
+        # Custom mapping file
+        mappings:
+          custom_module: "my.collection.custom_module"
+        ```
+        
+        ```bash
+        # Command you're running
+        fqcn-converter convert --config custom.yml playbook.yml
+        ```
+      render: yaml
+
+  - type: textarea
+    id: expected-outcome
+    attributes:
+      label: Expected Outcome
+      description: What outcome are you hoping to achieve?
+      placeholder: |
+        Describe what you want to accomplish or what result you're expecting...
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional Information
+      description: Any other relevant information
+      placeholder: |
+        - Links to relevant documentation you've read
+        - Error messages you're encountering
+        - Constraints or requirements you're working with
+        - Timeline or urgency considerations

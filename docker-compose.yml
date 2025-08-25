@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  fqcn-converter:
+    build: .
+    container_name: fqcn-converter
+    volumes:
+      - ./ansible-projects:/workspace:rw
+      - ./reports:/app/reports:rw
+    working_dir: /workspace
+    environment:
+      - PYTHONPATH=/app
+      - ANSIBLE_HOST_KEY_CHECKING=False
+    command: ["fqcn-converter", "--help"]
+    
+  fqcn-converter-dev:
+    build: .
+    container_name: fqcn-converter-dev
+    volumes:
+      - .:/app:rw
+      - ./ansible-projects:/workspace:rw
+    working_dir: /app
+    environment:
+      - PYTHONPATH=/app
+      - ANSIBLE_HOST_KEY_CHECKING=False
+    command: ["bash"]
+    stdin_open: true
+    tty: true
+
+  test-runner:
+    build: .
+    container_name: fqcn-test-runner
+    volumes:
+      - .:/app:rw
+    working_dir: /app
+    environment:
+      - PYTHONPATH=/app
+    command: ["make", "test"]
+    profiles: ["test"]

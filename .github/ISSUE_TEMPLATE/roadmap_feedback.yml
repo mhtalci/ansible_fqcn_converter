@@ -1,0 +1,191 @@
+name: 🗺️ Roadmap Feedback
+description: Provide feedback on the project roadmap or suggest changes to priorities
+title: "[ROADMAP] "
+labels: ["roadmap", "feedback"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for providing feedback on our roadmap! Your input helps us prioritize features and plan future development.
+
+  - type: dropdown
+    id: feedback-type
+    attributes:
+      label: Feedback Type
+      description: What type of roadmap feedback are you providing?
+      options:
+        - Priority Suggestion
+        - Timeline Feedback
+        - Missing Feature
+        - Roadmap Item Clarification
+        - General Roadmap Feedback
+        - Community Need Assessment
+    validations:
+      required: true
+
+  - type: dropdown
+    id: roadmap-version
+    attributes:
+      label: Roadmap Version
+      description: Which roadmap version does this feedback relate to?
+      options:
+        - "v0.2.0 - Enhanced User Experience"
+        - "v0.3.0 - Advanced Conversion Features"
+        - "v1.0.0 - Stable API and Enterprise Features"
+        - "v1.1.0+ - Future Versions"
+        - "Overall Roadmap Strategy"
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-roadmap-item
+    attributes:
+      label: Current Roadmap Item (if applicable)
+      description: If your feedback relates to a specific roadmap item, please describe it
+      placeholder: |
+        Example: "Interactive Mode" feature in v0.2.0
+        or "AI-assisted module detection" in v0.3.0
+
+  - type: textarea
+    id: feedback-details
+    attributes:
+      label: Detailed Feedback
+      description: Provide your detailed feedback or suggestions
+      placeholder: |
+        Please be specific about:
+        - What you like or don't like about the current roadmap
+        - Suggestions for changes or improvements
+        - Missing features or capabilities
+        - Timeline concerns or suggestions
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority-impact
+    attributes:
+      label: Priority Impact
+      description: How would your suggestion affect the current priorities?
+      options:
+        - Should be higher priority
+        - Should be lower priority
+        - Should be moved to different version
+        - Should be added to roadmap
+        - Timeline should be adjusted
+        - No priority change needed
+    validations:
+      required: true
+
+  - type: textarea
+    id: business-justification
+    attributes:
+      label: Business Justification
+      description: Why is this feedback important? What's the business or user impact?
+      placeholder: |
+        Explain the impact:
+        - How many users would be affected
+        - What problems it would solve
+        - Why the timing matters
+        - Business or technical benefits
+
+  - type: dropdown
+    id: user-segment
+    attributes:
+      label: User Segment
+      description: Which user segment does this feedback represent?
+      options:
+        - Individual Developers
+        - Small Teams
+        - Medium Organizations
+        - Large Enterprises
+        - Open Source Projects
+        - Educational Institutions
+        - All Users
+        - Specific Use Case
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case-context
+    attributes:
+      label: Use Case Context
+      description: Provide context about your specific use case or environment
+      placeholder: |
+        Help us understand your context:
+        - Size of your Ansible deployment
+        - Types of playbooks you work with
+        - Current pain points or challenges
+        - How the roadmap items would help
+
+  - type: textarea
+    id: alternative-approaches
+    attributes:
+      label: Alternative Approaches
+      description: Are there alternative ways to address the need you've identified?
+      placeholder: |
+        Consider:
+        - Different implementation approaches
+        - Workarounds you're currently using
+        - Other tools or solutions you've considered
+        - Phased implementation options
+
+  - type: checkboxes
+    id: community-support
+    attributes:
+      label: Community Support
+      description: How can you support this roadmap feedback?
+      options:
+        - label: I can help validate requirements and use cases
+        - label: I can participate in design discussions
+        - label: I can help with testing and feedback
+        - label: I can contribute code or documentation
+        - label: I can help gather community input
+
+  - type: textarea
+    id: success-metrics
+    attributes:
+      label: Success Metrics
+      description: How would you measure the success of addressing this feedback?
+      placeholder: |
+        What would success look like:
+        - Specific metrics or KPIs
+        - User experience improvements
+        - Performance benchmarks
+        - Adoption indicators
+
+  - type: dropdown
+    id: urgency
+    attributes:
+      label: Urgency Level
+      description: How urgent is addressing this feedback?
+      options:
+        - Low - Can wait for future versions
+        - Medium - Should be considered in current planning
+        - High - Important for upcoming releases
+        - Critical - Affects adoption or major use cases
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any additional information that would help us understand your feedback
+      placeholder: |
+        Additional details:
+        - Links to related discussions or issues
+        - Examples from other projects
+        - Industry trends or standards
+        - Technical constraints or considerations
+
+  - type: checkboxes
+    id: follow-up
+    attributes:
+      label: Follow-up
+      description: How would you like to be involved in follow-up discussions?
+      options:
+        - label: I'd like to be notified of roadmap updates related to this feedback
+        - label: I'm available for follow-up discussions or interviews
+        - label: I can help facilitate community discussions on this topic
+        - label: I'd like to be involved in the implementation planning

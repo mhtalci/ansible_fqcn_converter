@@ -1,0 +1,94 @@
+name: Pipeline Overview
+
+"on":
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  pipeline-status:
+    name: Pipeline Status Dashboard
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate pipeline overview
+        run: |
+          echo "## 🚀 CI/CD Pipeline Overview" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "This repository uses a comprehensive CI/CD pipeline with the following components:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔄 Automated Workflows" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Workflow | Purpose | Trigger |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|---------|---------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Main CI** | Core testing & validation | Push/PR to main/develop |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Code Quality** | Linting, formatting, type checking | Push/PR to main/develop |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Security Scanning** | Vulnerability & compliance checks | Push/PR + Daily schedule |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Build Validation** | Package building & installation tests | Push/PR to main/develop |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Documentation** | Auto-generate and deploy docs | Push to main |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🎯 Quality Gates" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Test Coverage**: 95%+ coverage requirement" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Code Quality**: flake8, black, isort, mypy validation" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Security**: bandit, safety, CodeQL, secrets scanning" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Build Integrity**: Source/wheel building and installation testing" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Cross-Platform**: Testing on Ubuntu, Windows, macOS" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ **Multi-Python**: Support for Python 3.8-3.12" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 Monitoring & Reporting" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- 📈 **Coverage Reports**: Uploaded to Codecov" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔍 **Security Reports**: Bandit, Safety, CodeQL results" >> $GITHUB_STEP_SUMMARY
+          echo "- 📦 **Build Artifacts**: Source and wheel distributions" >> $GITHUB_STEP_SUMMARY
+          echo "- 📋 **Quality Summaries**: Detailed status in each workflow" >> $GITHUB_STEP_SUMMARY
+
+      - name: Check workflow files
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📁 Workflow Files Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          workflows=(
+            "ci.yml:Main CI Pipeline"
+            "lint-format.yml:Code Quality & Formatting"
+            "security.yml:Security Scanning"
+            "build-validation.yml:Build Validation"
+            "deploy-docs.yml:Documentation Deployment"
+          )
+          
+          echo "| Workflow File | Description | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------------|-------------|--------|" >> $GITHUB_STEP_SUMMARY
+          
+          for workflow in "${workflows[@]}"; do
+            IFS=':' read -r file desc <<< "$workflow"
+            if [ -f ".github/workflows/$file" ]; then
+              echo "| $file | $desc | ✅ Present |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| $file | $desc | ❌ Missing |" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+
+      - name: Validate workflow syntax
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ✅ Workflow Validation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Basic YAML syntax validation
+          for workflow in .github/workflows/*.yml; do
+            if [ -f "$workflow" ]; then
+              filename=$(basename "$workflow")
+              echo "Validating $filename..."
+              
+              # Check if file is valid YAML (basic check)
+              if python -c "import yaml; yaml.safe_load(open('$workflow'))" 2>/dev/null; then
+                echo "- ✅ $filename: Valid YAML syntax" >> $GITHUB_STEP_SUMMARY
+              else
+                echo "- ❌ $filename: Invalid YAML syntax" >> $GITHUB_STEP_SUMMARY
+              fi
+            fi
+          done
