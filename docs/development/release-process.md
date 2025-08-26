@@ -149,31 +149,31 @@ on:
     tags: ['v*']
 
 jobs:
-  test:
+  test-and-publish:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.8, 3.9, '3.10', 3.11, 3.12]
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install and test
+        python-version: '3.11'
+    - name: Install dependencies
       run: |
+        python -m pip install --upgrade pip
         pip install -e ".[dev]"
-        pytest --cov=fqcn_converter
-
-  publish:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Build and publish
+    - name: Run tests
+      run: pytest --cov=fqcn_converter --cov-report=term-missing
+    - name: Run linting
       run: |
+        flake8 src tests
+        black --check src tests
+        mypy src
+    - name: Build package
+      run: |
+        python -m pip install build
         python -m build
-        twine upload dist/*
+    - name: Publish to PyPI
+      run: twine upload dist/*
       env:
         TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
 ```
@@ -200,11 +200,11 @@ git push origin v0.1.10
 ## Quality Gates
 
 ### Automated Quality Gates
-- [ ] All tests pass (unit, integration, performance)
-- [ ] Code coverage ≥ 95%
-- [ ] No critical security vulnerabilities
-- [ ] No linting errors
-- [ ] Documentation builds successfully
+- [ ] All tests pass with coverage reporting
+- [ ] Code coverage ≥ 80%
+- [ ] No linting errors (flake8, black, mypy)
+- [ ] Package builds successfully
+- [ ] Installation verification passes
 
 ### Manual Quality Gates
 - [ ] Manual testing completed

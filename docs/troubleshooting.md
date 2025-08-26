@@ -176,11 +176,11 @@ fqcn-converter validate --config custom_mappings.yml
 ```yaml
 # GitHub Actions - ensure proper setup
 - name: Setup Python
-  uses: actions/setup-python@v4
+  uses: actions/setup-python@v5
   with:
-    python-version: '3.9'
+    python-version: '3.11'
 
-- name: Install FQCN Converter
+- name: Install dependencies
   run: |
     python -m pip install --upgrade pip
     pip install git+https://github.com/mhtalci/ansible_fqcn_converter.git

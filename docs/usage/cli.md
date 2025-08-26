@@ -175,19 +175,21 @@ Use with: `fqcn-converter convert --config fqcn_config.yml`
 ### GitHub Actions
 
 ```yaml
-name: FQCN Validation
+name: CI
 on: [push, pull_request]
 jobs:
-  validate-fqcn:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
-      - name: Install FQCN Converter
-        run: pip install git+https://github.com/mhtalci/ansible_fqcn_converter.git
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install git+https://github.com/mhtalci/ansible_fqcn_converter.git
       - name: Validate FQCN Usage
         run: fqcn-converter validate --strict
 ```

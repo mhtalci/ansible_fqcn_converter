@@ -179,9 +179,9 @@ Ensure Ansible code meets FQCN compliance standards
 
 *Workflow:* 1. Run validation, 2. Check scores, 3. Fix issues, 4. Re-validate
 
-**Quality Gates**
+**CI Integration**
 
-Use validation in CI/CD as quality gates before deployment
+Use validation in CI/CD pipelines for automated compliance checking
 
 *Workflow:* 1. Validate on PR, 2. Block merge if failed, 3. Generate reports
 
