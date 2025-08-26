@@ -1,41 +1,94 @@
 [run]
-source = src/fqcn_converter
-omit = 
+# Source code to measure coverage for
+source = src/fqcn_converter/utils/logging
+
+# Omit test files and other non-source files from coverage
+omit =
+    tests/*
     */tests/*
-    */test_*
-    */_version.py
-    */conftest.py
-    */setup.py
+    */__pycache__/*
+    */venv/*
+    */env/*
+    setup.py
+    conftest.py
+
+# Enable branch coverage for more comprehensive analysis
 branch = True
-parallel = True
+
+# Disable parallel processing to prevent hanging
+parallel = False
+
+# Use thread concurrency instead of multiprocessing
+concurrency = thread
+
+# Ensure proper cleanup on termination
+sigterm = True
 
 [report]
+# Fail if coverage is below 100%
+fail_under = 100
+
+# Show missing lines in terminal report
+show_missing = True
+
+# Skip files with 100% coverage in summary (focus on incomplete files)
+skip_covered = False
+
+# Skip empty files
+skip_empty = True
+
+# Precision for coverage percentages
+precision = 2
+
+# Sort by coverage percentage (lowest first)
+sort = Cover
+
+# Exclude lines from coverage analysis
 exclude_lines =
+    # Have to re-enable the standard pragma
     pragma: no cover
+    
+    # Don't complain about missing debug-only code:
     def __repr__
-    if self.debug:
-    if settings.DEBUG
+    if self\.debug
+    
+    # Don't complain if tests don't hit defensive assertion code:
     raise AssertionError
     raise NotImplementedError
+    
+    # Don't complain if non-runnable code isn't run:
     if 0:
     if __name__ == .__main__.:
-    class .*\bProtocol\):
+    
+    # Don't complain about abstract methods
     @(abc\.)?abstractmethod
-    # Type checking imports
-    if TYPE_CHECKING:
-    # Defensive assertions
-    assert False
-    # Platform specific code
-    if sys.platform
-
-show_missing = True
-precision = 2
-skip_covered = False
-skip_empty = False
 
 [html]
+# Directory for HTML coverage report
 directory = htmlcov
-title = FQCN Converter Coverage Report
+
+# Show contexts in HTML report for better debugging
+show_contexts = True
+
+# Skip files with 100% coverage in HTML report
+skip_covered = False
+
+# Skip empty files in HTML report
+skip_empty = True
+
+# Title for HTML report
+title = FQCN Converter Logging Utils Coverage Report
 
 [xml]
+# Output file for XML coverage report
 output = coverage.xml
+
+[json]
+# Output file for JSON coverage report
+output = coverage.json
+
+# Pretty print JSON for readability
+pretty_print = True
+
+# Show contexts in JSON report
+show_contexts = True

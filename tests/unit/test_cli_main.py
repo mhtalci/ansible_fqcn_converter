@@ -204,15 +204,17 @@ class TestMainFunction:
         mock_convert_main.assert_called_once_with(mock_args)
         mock_setup_logging.assert_called_once_with('normal')
     
+    @patch('fqcn_converter.cli.main.preprocess_args')
     @patch('fqcn_converter.cli.main.create_parser')
     @patch('fqcn_converter.cli.main.setup_logging')
     @patch('fqcn_converter.cli.validate.main')
-    def test_main_validate_command(self, mock_validate_main, mock_setup_logging, mock_create_parser):
+    def test_main_validate_command(self, mock_validate_main, mock_setup_logging, mock_create_parser, mock_preprocess_args):
         """Test main function with validate command."""
-        mock_args = Mock(command='validate', verbosity='verbose')
+        mock_args = Mock(command='validate', verbosity='normal')
         mock_parser = Mock()
         mock_parser.parse_args.return_value = mock_args
         mock_create_parser.return_value = mock_parser
+        mock_preprocess_args.return_value = ([], 'verbose')  # Return verbose from preprocessing
         mock_validate_main.return_value = 0
         
         result = main()
@@ -298,15 +300,17 @@ class TestMainFunction:
             assert result == 1
             mock_logger.error.assert_called_once_with("Unexpected error: Unexpected error")
     
+    @patch('fqcn_converter.cli.main.preprocess_args')
     @patch('fqcn_converter.cli.main.create_parser')
     @patch('fqcn_converter.cli.main.setup_logging')
     @patch('fqcn_converter.cli.convert.main')
-    def test_main_exception_with_verbose_logging(self, mock_convert_main, mock_setup_logging, mock_create_parser):
+    def test_main_exception_with_verbose_logging(self, mock_convert_main, mock_setup_logging, mock_create_parser, mock_preprocess_args):
         """Test main function exception handling with verbose logging."""
-        mock_args = Mock(command='convert', verbosity='verbose')
+        mock_args = Mock(command='convert', verbosity='normal')
         mock_parser = Mock()
         mock_parser.parse_args.return_value = mock_args
         mock_create_parser.return_value = mock_parser
+        mock_preprocess_args.return_value = ([], 'verbose')  # Return verbose from preprocessing
         mock_convert_main.side_effect = Exception("Unexpected error")
         
         with patch('logging.getLogger') as mock_get_logger:

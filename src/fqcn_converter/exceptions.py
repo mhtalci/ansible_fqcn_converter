@@ -22,14 +22,14 @@ class FQCNConverterError(Exception):
     def __init__(
         self,
         message: str,
-        details: str = "",
+        details: Optional[str] = None,
         suggestions: Optional[List[str]] = None,
         recovery_actions: Optional[List[str]] = None,
         error_code: Optional[str] = None,
         context: Optional[Dict[str, Any]] = None,
     ) -> None:
         self.message = message
-        self.details = details
+        self.details = details or ""
         self.suggestions = suggestions or []
         self.recovery_actions = recovery_actions or []
         self.error_code = error_code

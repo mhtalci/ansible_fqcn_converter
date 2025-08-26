@@ -76,7 +76,10 @@ class JSONFormatter(logging.Formatter):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.hostname = os.uname().nodename if hasattr(os, "uname") else "unknown"
+        try:
+            self.hostname = os.uname().nodename if hasattr(os, "uname") else "unknown"
+        except (AttributeError, OSError):
+            self.hostname = "unknown"
 
     def format(self, record: logging.LogRecord) -> str:
         """Format the log record as JSON."""

@@ -12,6 +12,8 @@ import yaml
 
 def safe_load(content: str) -> Any:
     """Safely load YAML content."""
+    if content is None:
+        return None
     return yaml.safe_load(content)
 
 
