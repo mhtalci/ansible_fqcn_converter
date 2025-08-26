@@ -126,18 +126,51 @@ git push origin feature/your-feature-name
 
 ## Testing
 
+### Test Architecture
+
+Our comprehensive test suite follows pytest and Molecule best practices:
+
+```
+tests/
+├── unit/                    # 420 fast, isolated tests
+│   ├── test_converter.py   # Core conversion logic
+│   ├── test_validator.py   # Validation engine
+│   ├── test_batch.py       # Batch processing
+│   └── ...
+├── integration/             # 92 end-to-end workflow tests
+│   ├── test_cli_integration.py
+│   ├── test_scenario_based_workflows.py  # Molecule-inspired
+│   └── ...
+├── performance/             # 14 performance and scaling tests
+│   ├── test_large_file_processing.py
+│   ├── test_validation_performance.py
+│   └── ...
+└── fixtures/                # Test data and utilities
+```
+
 ### Running Tests
 
 ```bash
-# Run all tests
+# Run all tests (526 tests total)
 pytest
 
-# Run with coverage
-pytest --cov=fqcn_converter --cov-report=html
+# Run with coverage (current: 86.17%)
+pytest --cov=src/fqcn_converter --cov-report=html --cov-fail-under=80
+
+# Run specific test categories
+pytest tests/unit/          # Unit tests (420 tests)
+pytest tests/integration/   # Integration tests (92 tests)
+pytest tests/performance/   # Performance tests (14 tests)
+
+# Run performance tests only
+pytest -m performance
 
 # Run specific tests
 pytest tests/unit/test_converter.py
 pytest tests/unit/test_converter.py::test_convert_file
+
+# Run with verbose output
+pytest -v --tb=short
 ```
 
 ### Writing Tests

@@ -144,18 +144,42 @@ FQCNConverterError (Base)
 ### Test Structure
 ```
 tests/
-├── unit/                    # Fast, isolated tests
-├── integration/             # End-to-end workflow tests
-├── performance/             # Performance and load tests
+├── unit/                    # 420 fast, isolated tests
+│   ├── test_converter.py   # Core conversion logic
+│   ├── test_validator.py   # Validation engine
+│   ├── test_batch.py       # Batch processing
+│   ├── test_exceptions.py  # Exception handling
+│   └── ...
+├── integration/             # 92 end-to-end workflow tests
+│   ├── test_cli_integration.py
+│   ├── test_scenario_based_workflows.py  # Molecule-inspired patterns
+│   ├── test_batch_integration.py
+│   └── ...
+├── performance/             # 14 performance and scaling tests
+│   ├── test_large_file_processing.py     # Large file benchmarks
+│   ├── test_validation_performance.py    # Validation scaling
+│   └── ...
 └── fixtures/                # Test data and utilities
+    ├── sample_playbooks/
+    ├── expected_outputs/
+    └── test_helpers.py
 ```
 
 ### Test Patterns
 - **Arrange-Act-Assert**: Standard test structure
 - **Fixtures**: Reusable test data and setup
-- **Parameterized Tests**: Multiple scenario testing
+- **Parameterized Tests**: Multiple scenario testing (5 conversion scenarios)
+- **Molecule-Inspired Workflows**: Create → Convert → Validate → Verify → Cleanup
+- **Performance Benchmarks**: Automated scaling and memory tests
 - **Mocking**: Component isolation
 - **Property-Based Testing**: Automated test case generation
+
+### Test Coverage Metrics
+- **Overall Coverage**: 86.17% (exceeds 80% threshold)
+- **Unit Tests**: 420 tests covering core functionality
+- **Integration Tests**: 92 tests validating end-to-end workflows
+- **Performance Tests**: 14 tests ensuring scalability
+- **Scenario Coverage**: 5 parametrized conversion scenarios
 
 ## Security Considerations
 

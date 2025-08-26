@@ -1,6 +1,6 @@
 [run]
 # Source code to measure coverage for
-source = src/fqcn_converter/utils/logging
+source = src/fqcn_converter
 
 # Omit test files and other non-source files from coverage
 omit =

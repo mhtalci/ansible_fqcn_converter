@@ -3,7 +3,7 @@
 Generate Ansible Collections Requirements File
 
 This script generates a comprehensive requirements.yml file for all Ansible collections
-supported by the FQCN converter, using Context7 documentation for accurate version information.
+supported by the FQCN converter.
 
 Usage:
     python3 scripts/generate_collections_requirements.py [--output requirements.yml] [--include-all]

@@ -24,7 +24,7 @@ repos:
           - flake8-bugbear
           - flake8-comprehensions
           - flake8-simplify
-        args: [--max-line-length=88, --extend-ignore=E203,E701]
+        args: [--max-line-length=88, --extend-ignore=E203, E701]
 
   # MyPy - Static type checking
   - repo: https://github.com/pre-commit/mirrors-mypy
@@ -91,7 +91,7 @@ repos:
       - id: commitizen
         stages: [commit-msg]
 
-  # Context7 API Documentation Generation
+  # Local hooks
   - repo: local
     hooks:
       - id: version-consistency
@@ -100,15 +100,7 @@ repos:
         language: system
         files: ^(src/fqcn_converter/_version\.py|pyproject\.toml)$
         pass_filenames: false
-      
-      - id: context7-docs
-        name: Generate Context7 API Documentation
-        entry: python scripts/pre-commit-context7-docs.py
-        language: system
-        files: ^src/.*\.py$
-        pass_filenames: false
-        always_run: false
-        
+
       - id: workflow-validation
         name: Validate GitHub Workflow Files
         entry: python scripts/validate_workflow_files.py
@@ -122,8 +114,8 @@ ci:
 
     for more information, see https://pre-commit.ci
   autofix_prs: true
-  autoupdate_branch: ''
-  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_branch: ""
+  autoupdate_commit_msg: "[pre-commit.ci] pre-commit autoupdate"
   autoupdate_schedule: weekly
   skip: []
   submodules: false

@@ -62,20 +62,6 @@
       ]
     }
   ],
-  "context7": {
-    "enabled": true,
-    "auto_regenerate": true,
-    "api_docs": {
-      "source": "src/fqcn_converter",
-      "output": "docs/reference/api",
-      "format": "markdown"
-    },
-    "cli_docs": {
-      "source": "src/fqcn_converter/cli",
-      "output": "docs/usage",
-      "format": "markdown"
-    }
-  },
   "deployment": {
     "provider": "github-pages",
     "branch": "gh-pages",

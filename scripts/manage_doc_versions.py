@@ -3,7 +3,7 @@
 Documentation Version Management Script
 
 This script manages documentation versions for GitHub Pages deployment,
-including version switching, archiving, and Context7 integration.
+including version switching and archiving.
 """
 
 import json
@@ -63,9 +63,6 @@ class DocumentationVersionManager:
         version_dir = self.versions_dir / version
         version_dir.mkdir(parents=True, exist_ok=True)
 
-        # Generate Context7 documentation for this version
-        self._generate_context7_docs()
-
         # Copy current documentation to version directory
         self._copy_current_docs(version_dir)
 
@@ -87,24 +84,6 @@ class DocumentationVersionManager:
         self._save_config(self.config)
 
         print(f"✅ Created documentation version {version}")
-
-    def _generate_context7_docs(self) -> None:
-        """Generate Context7 documentation."""
-        try:
-            # Generate API documentation
-            api_script = self.project_root / "scripts" / "generate_context7_docs.py"
-            if api_script.exists():
-                subprocess.run([sys.executable, str(api_script)], check=True)
-                print("✅ Generated Context7 API documentation")
-
-            # Generate CLI documentation
-            cli_script = self.project_root / "scripts" / "generate_context7_cli_docs.py"
-            if cli_script.exists():
-                subprocess.run([sys.executable, str(cli_script)], check=True)
-                print("✅ Generated Context7 CLI documentation")
-
-        except subprocess.CalledProcessError as e:
-            print(f"⚠️  Warning: Failed to generate Context7 documentation: {e}")
 
     def _copy_current_docs(self, version_dir: Path) -> None:
         """Copy current documentation to version directory."""

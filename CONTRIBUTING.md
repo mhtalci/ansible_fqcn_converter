@@ -226,9 +226,6 @@ pytest tests/performance/ -m performance
 ### Building Documentation
 
 ```bash
-# Generate API documentation
-python scripts/generate_context7_docs.py
-
 # Build documentation site (if applicable)
 mkdocs serve
 ```

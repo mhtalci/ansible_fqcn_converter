@@ -1,7 +1,7 @@
 # FQCN Mapping Configuration
 # This file defines the mapping from short module names to their Fully Qualified Collection Names (FQCN)
 # Used by the FQCN conversion script to modernize Ansible playbooks and roles
-# Enhanced with comprehensive collection support using Context7 documentation
+# Enhanced with comprehensive collection support
 
 # Ansible Builtin Modules (ansible.builtin collection)
 ansible_builtin:
