@@ -105,7 +105,7 @@ fqcn-converter --help
 ```
 </details>
 
-For detailed installation instructions including troubleshooting, see our [Installation Guide](INSTALLATION.md).
+For detailed installation instructions including troubleshooting, see our [Installation Guide](docs/installation.md).
 
 ### 🚨 Important: GitHub-Only Distribution
 
@@ -173,7 +173,7 @@ print(result.converted_content)
 3. **Validate Results**: Use the validation command to ensure everything is correct
 4. **Test Your Playbooks**: Run your playbooks to ensure they still work correctly
 
-For comprehensive usage examples, see our [CLI Usage Guide](docs/usage/cli.md) and [Python API Guide](docs/usage/api.md).
+For comprehensive usage examples, see our [CLI Usage Guide](docs/usage/cli.md), [Python API Guide](docs/usage/api.md), and [Migration Guide](docs/migration-guide.md).
 
 ## 🧠 Smart Conflict Resolution
 
@@ -382,10 +382,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- **Documentation**: [docs/](docs/)
-- **Issues**: [GitHub Issues](https://github.com/mhtalci/ansible_fqcn_converter/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/mhtalci/ansible_fqcn_converter/discussions)
-- **Security**: hello@mehmetalci.com
+- **📚 Documentation**: [Complete Documentation](docs/) - Installation, usage, API reference, and more
+- **❓ FAQ**: [Frequently Asked Questions](docs/faq.md) - Common questions and solutions
+- **🚀 Migration Guide**: [Step-by-step Migration](docs/migration-guide.md) - Complete migration process
+- **🐛 Issues**: [GitHub Issues](https://github.com/mhtalci/ansible_fqcn_converter/issues) - Bug reports and feature requests
+- **💬 Discussions**: [GitHub Discussions](https://github.com/mhtalci/ansible_fqcn_converter/discussions) - Community support and questions
+- **🔒 Security**: hello@mehmetalci.com - Security-related concerns
 
 ---
 

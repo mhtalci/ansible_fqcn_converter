@@ -5,12 +5,12 @@ This module provides a comprehensive library of sample Ansible content
 including playbooks, roles, tasks, and various edge cases.
 """
 
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 
 class SamplePlaybooks:
     """Collection of sample Ansible playbooks for testing."""
-    
+
     @staticmethod
     def simple_web_server() -> str:
         """Simple web server playbook."""
@@ -39,7 +39,7 @@ class SamplePlaybooks:
         group: www-data
         mode: '0644'
 """
-    
+
     @staticmethod
     def complex_multi_role() -> str:
         """Complex multi-role playbook."""
@@ -170,7 +170,7 @@ class SamplePlaybooks:
         state: present
       become_user: postgres
 """
-    
+
     @staticmethod
     def legacy_syntax() -> str:
         """Playbook with legacy Ansible syntax."""
@@ -198,7 +198,7 @@ class SamplePlaybooks:
     - name: restart apache
       service: name=httpd state=restarted
 """
-    
+
     @staticmethod
     def with_blocks_and_error_handling() -> str:
         """Playbook with blocks, rescue, and always sections."""
@@ -262,7 +262,7 @@ class SamplePlaybooks:
             dest: "/usr/local/bin/cleanup.sh"
             mode: '0755'
 """
-    
+
     @staticmethod
     def with_includes_and_imports() -> str:
         """Playbook with includes and imports."""
@@ -303,12 +303,12 @@ class SamplePlaybooks:
 
 class SampleRoles:
     """Collection of sample Ansible roles for testing."""
-    
+
     @staticmethod
     def webserver_role() -> Dict[str, str]:
         """Complete webserver role files."""
         return {
-            'tasks/main.yml': """---
+            "tasks/main.yml": """---
 # Main tasks for webserver role
 - name: Include OS-specific variables
   include_vars: "{{ ansible_os_family }}.yml"
@@ -382,8 +382,7 @@ class SampleRoles:
     - 443
   when: configure_firewall | default(true)
 """,
-            
-            'handlers/main.yml': """---
+            "handlers/main.yml": """---
 - name: restart webserver
   service:
     name: "{{ webserver_service }}"
@@ -399,8 +398,7 @@ class SampleRoles:
     name: ufw
     state: restarted
 """,
-            
-            'vars/main.yml': """---
+            "vars/main.yml": """---
 webserver_document_root: /var/www/html
 webserver_log_dir: /var/log/webserver
 webserver_config_dir: /etc/webserver
@@ -415,16 +413,14 @@ webserver_vhosts:
     document_root: "{{ webserver_document_root }}/example"
     server_name: example.com
 """,
-            
-            'defaults/main.yml': """---
+            "defaults/main.yml": """---
 webserver_package: nginx
 webserver_service: nginx
 webserver_home: /var/www
 configure_firewall: true
 enable_ssl: false
 """,
-            
-            'meta/main.yml': """---
+            "meta/main.yml": """---
 galaxy_info:
   author: Test Author
   description: Web server configuration role
@@ -448,14 +444,14 @@ galaxy_info:
     - apache
 
 dependencies: []
-"""
+""",
         }
-    
+
     @staticmethod
     def database_role() -> Dict[str, str]:
         """Complete database role files."""
         return {
-            'tasks/main.yml': """---
+            "tasks/main.yml": """---
 - name: Install database packages
   package:
     name: "{{ item }}"
@@ -524,8 +520,7 @@ dependencies: []
   loop: "{{ application_databases }}"
   when: database_type == "mysql"
 """,
-            
-            'handlers/main.yml': """---
+            "handlers/main.yml": """---
 - name: restart database
   service:
     name: "{{ database_service }}"
@@ -536,8 +531,7 @@ dependencies: []
     name: "{{ database_service }}"
     state: reloaded
 """,
-            
-            'defaults/main.yml': """---
+            "defaults/main.yml": """---
 database_type: mysql
 database_user: mysql
 database_group: mysql
@@ -558,13 +552,13 @@ database_init_marker: mysql
 mysql_root_password: "{{ vault_mysql_root_password | default('changeme') }}"
 
 application_databases: []
-"""
+""",
         }
 
 
 class SampleTaskFiles:
     """Collection of sample task files for testing."""
-    
+
     @staticmethod
     def system_setup() -> str:
         """System setup tasks."""
@@ -627,7 +621,7 @@ class SampleTaskFiles:
     line: "127.0.1.1 {{ inventory_hostname }}"
     regexp: "^127\\.0\\.1\\.1"
 """
-    
+
     @staticmethod
     def security_hardening() -> str:
         """Security hardening tasks."""
@@ -715,7 +709,7 @@ class SampleTaskFiles:
 
 class EdgeCaseContent:
     """Edge case content for testing converter robustness."""
-    
+
     @staticmethod
     def malformed_yaml() -> str:
         """Malformed YAML content."""
@@ -726,12 +720,12 @@ class EdgeCaseContent:
     - name: Invalid structure
       invalid: [
 """
-    
+
     @staticmethod
     def empty_file() -> str:
         """Empty file content."""
         return ""
-    
+
     @staticmethod
     def comments_only() -> str:
         """File with only comments."""
@@ -739,7 +733,7 @@ class EdgeCaseContent:
 # No actual Ansible content
 # Should be handled gracefully
 """
-    
+
     @staticmethod
     def mixed_indentation() -> str:
         """Content with mixed indentation."""
@@ -756,7 +750,7 @@ class EdgeCaseContent:
 	    name: nginx
 	    state: started
 """
-    
+
     @staticmethod
     def unicode_content() -> str:
         """Content with Unicode characters."""
@@ -777,7 +771,7 @@ class EdgeCaseContent:
       debug:
         msg: "Processing: {{ message }}"
 """
-    
+
     @staticmethod
     def very_long_lines() -> str:
         """Content with very long lines."""
@@ -793,7 +787,7 @@ class EdgeCaseContent:
         name: "this-is-a-very-long-package-name-that-might-be-used-in-some-enterprise-environments-where-package-names-can-be-quite-verbose-and-descriptive"
         state: present
 """
-    
+
     @staticmethod
     def nested_variables() -> str:
         """Content with deeply nested variables."""
@@ -834,7 +828,7 @@ class EdgeCaseContent:
 
 class ConversionTestCases:
     """Test cases for specific conversion scenarios."""
-    
+
     @staticmethod
     def parameter_vs_module_conflicts() -> str:
         """Content that tests parameter vs module name conflicts."""
@@ -873,7 +867,7 @@ class ConversionTestCases:
         name: nginx
         state: started
 """
-    
+
     @staticmethod
     def already_converted_mixed() -> str:
         """Content with mix of converted and unconverted modules."""
@@ -907,7 +901,7 @@ class ConversionTestCases:
         image: nginx:latest
         state: started
 """
-    
+
     @staticmethod
     def complex_jinja_expressions() -> str:
         """Content with complex Jinja2 expressions."""

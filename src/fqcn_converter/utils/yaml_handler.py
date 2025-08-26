@@ -5,8 +5,9 @@ This module provides safe YAML loading and processing functionality
 with proper error handling and validation.
 """
 
-from typing import Any, Dict, Union
 from pathlib import Path
+from typing import Any, Dict, Union
+
 import yaml
 
 

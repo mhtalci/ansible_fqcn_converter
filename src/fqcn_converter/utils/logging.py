@@ -15,8 +15,8 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
 from threading import Lock
+from typing import Any, Dict, Optional, Union
 
 # Global logger registry and configuration lock
 _logger_registry: Dict[str, logging.Logger] = {}
@@ -27,7 +27,7 @@ _current_config: Optional[Dict[str, Any]] = None
 class PerformanceFilter(logging.Filter):
     """Filter that adds performance metrics to log records."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.start_time = time.time()
 
@@ -74,7 +74,7 @@ class JSONFormatter(logging.Formatter):
     Useful for automation, log aggregation, and analysis tools.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         try:
             self.hostname = os.uname().nodename if hasattr(os, "uname") else "unknown"
@@ -468,7 +468,7 @@ def configure_logger_for_module(
 
 
 def log_performance_metrics(
-    logger: logging.Logger, operation: str, start_time: float, **kwargs
+    logger: logging.Logger, operation: str, start_time: float, **kwargs: Any
 ) -> None:
     """
     Log performance metrics for an operation.

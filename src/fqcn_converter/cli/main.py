@@ -8,9 +8,9 @@ for convert, validate, and batch operations.
 import argparse
 import logging
 import sys
-from typing import Optional, List, Tuple
+from typing import List, Optional, Tuple
 
-from . import convert, validate, batch
+from . import batch, convert, validate
 
 
 def setup_logging(verbosity: str) -> None:
@@ -174,47 +174,45 @@ Examples:
 def preprocess_args(args: List[str]) -> Tuple[List[str], str]:
     """
     Preprocess command line arguments to extract global flags and reorder them.
-    
+
     This allows global flags like --verbose, --quiet, --debug to be placed anywhere
     in the command line, including after the subcommand.
-    
+
     Args:
         args: Raw command line arguments
-        
+
     Returns:
         Tuple of (reordered_args, verbosity_level)
     """
-    global_flags = {
-        '--verbose', '-v', '--quiet', '-q', '--debug', '--version'
-    }
-    
+    global_flags = {"--verbose", "-v", "--quiet", "-q", "--debug", "--version"}
+
     verbosity = "normal"
     reordered_args = []
     global_args = []
     i = 0
-    
+
     while i < len(args):
         arg = args[i]
-        
-        if arg in ['--verbose', '-v']:
+
+        if arg in ["--verbose", "-v"]:
             verbosity = "verbose"
             global_args.append(arg)
-        elif arg in ['--quiet', '-q']:
+        elif arg in ["--quiet", "-q"]:
             verbosity = "quiet"
             global_args.append(arg)
-        elif arg == '--debug':
+        elif arg == "--debug":
             verbosity = "verbose"
             global_args.append(arg)
-        elif arg == '--version':
+        elif arg == "--version":
             global_args.append(arg)
         else:
             reordered_args.append(arg)
-        
+
         i += 1
-    
+
     # Put global args first, then the rest
     final_args = global_args + reordered_args
-    
+
     return final_args, verbosity
 
 
@@ -223,16 +221,16 @@ def main() -> Optional[int]:
     # Preprocess arguments to handle global flags in any position
     raw_args = sys.argv[1:]
     processed_args, verbosity = preprocess_args(raw_args)
-    
+
     parser = create_parser()
-    
+
     # Parse the reordered arguments
     try:
         args = parser.parse_args(processed_args)
     except SystemExit as e:
         # Handle --version and --help exits gracefully
         return e.code
-    
+
     # Override verbosity if it was detected in preprocessing
     if verbosity != "normal":
         args.verbosity = verbosity

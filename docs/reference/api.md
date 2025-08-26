@@ -2,6 +2,21 @@
 
 Complete Python API reference for the FQCN Converter package.
 
+[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
+[![Test Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/mhtalci/ansible_fqcn_converter/actions)
+
+## Package Overview
+
+The `fqcn_converter` package provides a comprehensive API for converting Ansible playbooks to use Fully Qualified Collection Names (FQCN) with intelligent conflict resolution and validation.
+
+### Main Modules
+
+- **`fqcn_converter.core.converter`** - Core conversion functionality
+- **`fqcn_converter.core.validator`** - Validation engine
+- **`fqcn_converter.core.batch`** - Batch processing
+- **`fqcn_converter.config.manager`** - Configuration management
+- **`fqcn_converter.exceptions`** - Exception hierarchy
+
 ## Core Classes
 
 ### FQCNConverter

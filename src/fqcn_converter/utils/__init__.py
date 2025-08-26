@@ -1,6 +1,6 @@
 """Utility functions for FQCN Converter."""
 
-from .logging import setup_logging, get_logger
+from .logging import get_logger, setup_logging
 from .yaml_handler import load_yaml_file, save_yaml_file
 
 __all__ = [

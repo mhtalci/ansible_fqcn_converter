@@ -5,10 +5,11 @@ This module handles loading, merging, and managing FQCN mappings and
 converter settings from various sources.
 """
 
-import yaml
-from typing import Dict, Union, Optional, Any, List
-from pathlib import Path
 from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
+
+import yaml
 
 from ..exceptions import ConfigurationError
 from ..utils.logging import get_logger

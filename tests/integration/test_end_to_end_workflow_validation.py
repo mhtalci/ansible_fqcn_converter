@@ -6,100 +6,112 @@ all CLI commands, API usage, batch processing, dry-run scenarios, and
 custom mapping configurations with integration testing.
 """
 
-import pytest
-import tempfile
-import subprocess
 import json
-import yaml
 import os
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
 
+import pytest
+import yaml
+
+from fqcn_converter.config.manager import ConfigurationManager
+from fqcn_converter.core.batch import BatchProcessor
 from fqcn_converter.core.converter import FQCNConverter
 from fqcn_converter.core.validator import ValidationEngine
-from fqcn_converter.core.batch import BatchProcessor
-from fqcn_converter.config.manager import ConfigurationManager
 
 
 @pytest.fixture
 def custom_mapping_config(temp_dir):
     """Create custom FQCN mapping configuration."""
     config_file = temp_dir / "custom_mappings.yml"
-    
+
     config_data = {
-        'version': '1.0',
-        'metadata': {
-            'description': 'Custom FQCN mappings for testing',
-            'last_updated': '2025-01-01'
+        "version": "1.0",
+        "metadata": {
+            "description": "Custom FQCN mappings for testing",
+            "last_updated": "2025-01-01",
         },
-        'mappings': {
+        "mappings": {
             # Core modules
-            'package': 'ansible.builtin.package',
-            'service': 'ansible.builtin.service',
-            'user': 'ansible.builtin.user',
-            'group': 'ansible.builtin.group',
-            'file': 'ansible.builtin.file',
-            'copy': 'ansible.builtin.copy',
-            'template': 'ansible.builtin.template',
-            'lineinfile': 'ansible.builtin.lineinfile',
-            'command': 'ansible.builtin.command',
-            'shell': 'ansible.builtin.shell',
-            'cron': 'ansible.builtin.cron',
-            'uri': 'ansible.builtin.uri',
-            'git': 'ansible.builtin.git',
-            'archive': 'ansible.builtin.archive',
-            'stat': 'ansible.builtin.stat',
-            'fail': 'ansible.builtin.fail',
-            'debug': 'ansible.builtin.debug',
-            'set_fact': 'ansible.builtin.set_fact',
-            'include_vars': 'ansible.builtin.include_vars',
-            'include_role': 'ansible.builtin.include_role',
-            
+            "package": "ansible.builtin.package",
+            "service": "ansible.builtin.service",
+            "user": "ansible.builtin.user",
+            "group": "ansible.builtin.group",
+            "file": "ansible.builtin.file",
+            "copy": "ansible.builtin.copy",
+            "template": "ansible.builtin.template",
+            "lineinfile": "ansible.builtin.lineinfile",
+            "command": "ansible.builtin.command",
+            "shell": "ansible.builtin.shell",
+            "cron": "ansible.builtin.cron",
+            "uri": "ansible.builtin.uri",
+            "git": "ansible.builtin.git",
+            "archive": "ansible.builtin.archive",
+            "stat": "ansible.builtin.stat",
+            "fail": "ansible.builtin.fail",
+            "debug": "ansible.builtin.debug",
+            "set_fact": "ansible.builtin.set_fact",
+            "include_vars": "ansible.builtin.include_vars",
+            "include_role": "ansible.builtin.include_role",
             # Community modules
-            'mysql_db': 'community.mysql.mysql_db',
-            'mysql_user': 'community.mysql.mysql_user',
-            'ufw': 'community.general.ufw',
-            
+            "mysql_db": "community.mysql.mysql_db",
+            "mysql_user": "community.mysql.mysql_user",
+            "ufw": "community.general.ufw",
             # Custom test modules
-            'custom_module': 'custom.collection.custom_module',
-            'test_module': 'test.collection.test_module'
+            "custom_module": "custom.collection.custom_module",
+            "test_module": "test.collection.test_module",
         },
-        'settings': {
-            'conflict_resolution': 'context_aware',
-            'backup_files': True,
-            'validation_level': 'standard'
-        }
+        "settings": {
+            "conflict_resolution": "context_aware",
+            "backup_files": True,
+            "validation_level": "standard",
+        },
     }
-    
-    with open(config_file, 'w') as f:
+
+    with open(config_file, "w") as f:
         yaml.dump(config_data, f, default_flow_style=False)
-    
+
     return config_file
 
 
 class TestEndToEndWorkflowValidation:
     """Comprehensive end-to-end workflow validation tests."""
-    
+
     @pytest.fixture
     def comprehensive_test_project(self, temp_dir):
         """Create a comprehensive test project with various Ansible structures."""
         project_dir = temp_dir / "comprehensive_project"
-        
+
         # Create complex directory structure
         dirs = [
-            "group_vars", "host_vars", "inventories/production", "inventories/staging",
-            "roles/common/tasks", "roles/common/handlers", "roles/common/vars", "roles/common/defaults",
-            "roles/webserver/tasks", "roles/webserver/handlers", "roles/webserver/templates",
-            "roles/database/tasks", "roles/database/handlers", "roles/database/vars",
-            "playbooks", "filter_plugins", "library"
+            "group_vars",
+            "host_vars",
+            "inventories/production",
+            "inventories/staging",
+            "roles/common/tasks",
+            "roles/common/handlers",
+            "roles/common/vars",
+            "roles/common/defaults",
+            "roles/webserver/tasks",
+            "roles/webserver/handlers",
+            "roles/webserver/templates",
+            "roles/database/tasks",
+            "roles/database/handlers",
+            "roles/database/vars",
+            "playbooks",
+            "filter_plugins",
+            "library",
         ]
-        
+
         for dir_path in dirs:
             (project_dir / dir_path).mkdir(parents=True, exist_ok=True)
-        
+
         # Main site playbook with complex structure
-        (project_dir / "site.yml").write_text("""---
+        (project_dir / "site.yml").write_text(
+            """---
 - name: Common setup for all servers
   hosts: all
   become: yes
@@ -159,10 +171,12 @@ class TestEndToEndWorkflowValidation:
       command: mysql -e "SELECT 1"
       register: db_check
       changed_when: false
-""")
-        
+"""
+        )
+
         # Common role with comprehensive tasks
-        (project_dir / "roles/common/tasks/main.yml").write_text("""---
+        (project_dir / "roles/common/tasks/main.yml").write_text(
+            """---
 - name: Include OS-specific variables
   include_vars: "{{ ansible_os_family }}.yml"
   ignore_errors: yes
@@ -256,10 +270,12 @@ class TestEndToEndWorkflowValidation:
       notify: restart monitoring
   
   when: install_monitoring | default(true)
-""")
-        
+"""
+        )
+
         # Common role handlers
-        (project_dir / "roles/common/handlers/main.yml").write_text("""---
+        (project_dir / "roles/common/handlers/main.yml").write_text(
+            """---
 - name: restart ssh
   service:
     name: ssh
@@ -269,10 +285,12 @@ class TestEndToEndWorkflowValidation:
   service:
     name: "{{ monitoring_agent }}"
     state: restarted
-""")
-        
+"""
+        )
+
         # Webserver role tasks
-        (project_dir / "roles/webserver/tasks/main.yml").write_text("""---
+        (project_dir / "roles/webserver/tasks/main.yml").write_text(
+            """---
 - name: Install web server packages
   package:
     name: "{{ item }}"
@@ -410,10 +428,12 @@ class TestEndToEndWorkflowValidation:
         recurse: yes
   
   when: deploy_application | default(false)
-""")
-        
+"""
+        )
+
         # Webserver handlers
-        (project_dir / "roles/webserver/handlers/main.yml").write_text("""---
+        (project_dir / "roles/webserver/handlers/main.yml").write_text(
+            """---
 - name: restart webserver
   service:
     name: "{{ web_server_package }}"
@@ -423,10 +443,12 @@ class TestEndToEndWorkflowValidation:
   service:
     name: "{{ web_server_package }}"
     state: reloaded
-""")
-        
+"""
+        )
+
         # Database role tasks
-        (project_dir / "roles/database/tasks/main.yml").write_text("""---
+        (project_dir / "roles/database/tasks/main.yml").write_text(
+            """---
 - name: Install database server
   package:
     name: "{{ database_packages }}"
@@ -540,10 +562,12 @@ class TestEndToEndWorkflowValidation:
         login_password: "{{ database_root_password }}"
   
   when: database_type == 'mysql' and secure_database | default(true)
-""")
-        
+"""
+        )
+
         # Database handlers
-        (project_dir / "roles/database/handlers/main.yml").write_text("""---
+        (project_dir / "roles/database/handlers/main.yml").write_text(
+            """---
 - name: restart database
   service:
     name: "{{ database_service }}"
@@ -553,10 +577,12 @@ class TestEndToEndWorkflowValidation:
   service:
     name: "{{ monitoring_agent }}"
     state: restarted
-""")
-        
+"""
+        )
+
         # Group variables
-        (project_dir / "group_vars/all.yml").write_text("""---
+        (project_dir / "group_vars/all.yml").write_text(
+            """---
 # Application settings
 app_name: comprehensive_app
 app_user: webapp
@@ -687,10 +713,12 @@ database_backup_schedule:
 
 # Security settings
 secure_database: true
-""")
-        
+"""
+        )
+
         # Inventory files
-        (project_dir / "inventories/production/hosts.yml").write_text("""---
+        (project_dir / "inventories/production/hosts.yml").write_text(
+            """---
 all:
   children:
     webservers:
@@ -709,10 +737,12 @@ all:
     ansible_user: ubuntu
     ansible_ssh_private_key_file: ~/.ssh/production_key
     environment: production
-""")
-        
+"""
+        )
+
         # Additional playbooks
-        (project_dir / "playbooks/deploy.yml").write_text("""---
+        (project_dir / "playbooks/deploy.yml").write_text(
+            """---
 - name: Deploy application
   hosts: webservers
   become: yes
@@ -743,9 +773,11 @@ all:
         status_code: 200
       retries: 5
       delay: 10
-""")
-        
-        (project_dir / "playbooks/backup.yml").write_text("""---
+"""
+        )
+
+        (project_dir / "playbooks/backup.yml").write_text(
+            """---
 - name: Backup databases
   hosts: databases
   become: yes
@@ -777,134 +809,166 @@ all:
         owner: root
         group: root
         mode: '0600'
-""")
-        
-        return project_dir
-    
+"""
+        )
 
-    
-    def test_complete_cli_workflow_convert_command(self, comprehensive_test_project, custom_mapping_config):
+        return project_dir
+
+    def test_complete_cli_workflow_convert_command(
+        self, comprehensive_test_project, custom_mapping_config
+    ):
         """Test complete CLI workflow using convert command."""
         # Test single file conversion
         test_file = comprehensive_test_project / "site.yml"
-        
+
         # Test dry-run mode
         cmd = [
-            sys.executable, "-m", "fqcn_converter.cli.main",
+            sys.executable,
+            "-m",
+            "fqcn_converter.cli.main",
             "--verbose",
-            "convert", str(test_file),
+            "convert",
+            str(test_file),
             "--dry-run",
-            "--config", str(custom_mapping_config)
+            "--config",
+            str(custom_mapping_config),
         ]
-        
+
         result = subprocess.run(cmd, capture_output=True, text=True, cwd=Path.cwd())
-        
+
         assert result.returncode == 0
-        assert "dry run" in result.stdout.lower() or "would convert" in result.stdout.lower()
-        
+        assert (
+            "dry run" in result.stdout.lower()
+            or "would convert" in result.stdout.lower()
+        )
+
         # Verify file wasn't changed in dry-run
         original_content = test_file.read_text()
         assert "ansible.builtin." not in original_content
-        
+
         # Test actual conversion
         cmd = [
-            sys.executable, "-m", "fqcn_converter.cli.main",
+            sys.executable,
+            "-m",
+            "fqcn_converter.cli.main",
             "--verbose",
-            "convert", str(test_file),
-            "--config", str(custom_mapping_config)
+            "convert",
+            str(test_file),
+            "--config",
+            str(custom_mapping_config),
         ]
-        
+
         result = subprocess.run(cmd, capture_output=True, text=True, cwd=Path.cwd())
-        
+
         assert result.returncode == 0
-        
+
         # Verify file was converted
         converted_content = test_file.read_text()
         assert "ansible.builtin.package:" in converted_content
         assert "ansible.builtin.service:" in converted_content
         assert "ansible.builtin.uri:" in converted_content
         assert "ansible.builtin.command:" in converted_content
-    
-    def test_complete_cli_workflow_validate_command(self, comprehensive_test_project, custom_mapping_config):
+
+    def test_complete_cli_workflow_validate_command(
+        self, comprehensive_test_project, custom_mapping_config
+    ):
         """Test complete CLI workflow using validate command."""
         # First convert a file
         converter = FQCNConverter(config_path=custom_mapping_config)
         test_file = comprehensive_test_project / "roles/common/tasks/main.yml"
         converter.convert_file(test_file, dry_run=False)
-        
+
         # Test validation command
         cmd = [
-            sys.executable, "-m", "fqcn_converter.cli.main",
+            sys.executable,
+            "-m",
+            "fqcn_converter.cli.main",
             "--verbose",
-            "validate", str(test_file),
-            "--config", str(custom_mapping_config)
+            "validate",
+            str(test_file),
+            "--config",
+            str(custom_mapping_config),
         ]
-        
+
         result = subprocess.run(cmd, capture_output=True, text=True, cwd=Path.cwd())
-        
+
         assert result.returncode == 0
         assert "valid" in result.stdout.lower() or "score" in result.stdout.lower()
-    
-    def test_complete_cli_workflow_batch_command(self, comprehensive_test_project, custom_mapping_config):
+
+    def test_complete_cli_workflow_batch_command(
+        self, comprehensive_test_project, custom_mapping_config
+    ):
         """Test complete CLI workflow using batch command."""
         # Test batch processing with dry-run
         cmd = [
-            sys.executable, "-m", "fqcn_converter.cli.main",
+            sys.executable,
+            "-m",
+            "fqcn_converter.cli.main",
             "--verbose",
-            "batch", str(comprehensive_test_project),
+            "batch",
+            str(comprehensive_test_project),
             "--dry-run",
-            "--config", str(custom_mapping_config),
-            "--workers", "2"
+            "--config",
+            str(custom_mapping_config),
+            "--workers",
+            "2",
         ]
-        
+
         result = subprocess.run(cmd, capture_output=True, text=True, cwd=Path.cwd())
-        
+
         assert result.returncode == 0
         assert "projects" in result.stdout.lower()
-        
+
         # Test actual batch processing
         cmd = [
-            sys.executable, "-m", "fqcn_converter.cli.main",
+            sys.executable,
+            "-m",
+            "fqcn_converter.cli.main",
             "--verbose",
-            "batch", str(comprehensive_test_project),
-            "--config", str(custom_mapping_config),
-            "--workers", "2"
+            "batch",
+            str(comprehensive_test_project),
+            "--config",
+            str(custom_mapping_config),
+            "--workers",
+            "2",
         ]
-        
+
         result = subprocess.run(cmd, capture_output=True, text=True, cwd=Path.cwd())
-        
+
         assert result.returncode == 0
-        
+
         # Verify files were converted
         site_yml = comprehensive_test_project / "site.yml"
         site_content = site_yml.read_text()
         assert "ansible.builtin." in site_content
-    
-    def test_api_workflow_converter_integration(self, comprehensive_test_project, custom_mapping_config):
+
+    def test_api_workflow_converter_integration(
+        self, comprehensive_test_project, custom_mapping_config
+    ):
         """Test complete API workflow with converter integration."""
         # Initialize converter with custom config
         converter = FQCNConverter(config_path=custom_mapping_config)
-        
+
         # Test single file conversion
         test_file = comprehensive_test_project / "roles/webserver/tasks/main.yml"
         original_content = test_file.read_text()
-        
+
         # Test dry-run conversion
         dry_result = converter.convert_file(test_file, dry_run=True)
-        
+
         assert dry_result.success is True
         assert dry_result.changes_made > 0
         assert dry_result.converted_content != original_content
         assert test_file.read_text() == original_content  # File unchanged
-        
+
         # Test actual conversion
         actual_result = converter.convert_file(test_file, dry_run=False)
-        
+
         assert actual_result.success is True
         assert actual_result.changes_made == dry_result.changes_made
         assert test_file.read_text() == actual_result.converted_content
         assert "ansible.builtin." in test_file.read_text()
-        
+
         # Test content conversion
         test_content = """---
 - name: Test task
@@ -912,189 +976,205 @@ all:
     name: nginx
     state: present
 """
-        
+
         content_result = converter.convert_content(test_content)
-        
+
         assert content_result.success is True
         assert content_result.changes_made > 0
         assert "ansible.builtin.package:" in content_result.converted_content
-    
-    def test_api_workflow_validation_integration(self, comprehensive_test_project, custom_mapping_config):
+
+    def test_api_workflow_validation_integration(
+        self, comprehensive_test_project, custom_mapping_config
+    ):
         """Test complete API workflow with validation integration."""
         # Initialize components
         converter = FQCNConverter(config_path=custom_mapping_config)
         validator = ValidationEngine()
-        
+
         test_file = comprehensive_test_project / "roles/database/tasks/main.yml"
-        
+
         # Convert file first
         conversion_result = converter.convert_file(test_file, dry_run=False)
         assert conversion_result.success is True
-        
+
         # Validate converted file
         validation_result = validator.validate_conversion(test_file)
-        
+
         assert validation_result.valid is True
         assert validation_result.score > 0.8  # Should have high score after conversion
         assert len(validation_result.issues) == 0  # Should have no issues
-    
-    def test_api_workflow_batch_processing_integration(self, comprehensive_test_project, custom_mapping_config):
+
+    def test_api_workflow_batch_processing_integration(
+        self, comprehensive_test_project, custom_mapping_config
+    ):
         """Test complete API workflow with batch processing integration."""
         # Initialize batch processor
         batch_processor = BatchProcessor(max_workers=2)
-        
+
         # Discover projects
         projects = batch_processor.discover_projects(str(comprehensive_test_project))
         assert len(projects) >= 1
-        
+
         # Process projects with dry-run
         dry_results = batch_processor.process_projects(projects, dry_run=True)
-        
+
         assert len(dry_results) >= 1
-        assert all(result['success'] for result in dry_results)
-        
+        assert all(result["success"] for result in dry_results)
+
         # Process projects actually
         actual_results = batch_processor.process_projects(projects, dry_run=False)
-        
+
         assert len(actual_results) >= 1
-        assert all(result['success'] for result in actual_results)
-        
+        assert all(result["success"] for result in actual_results)
+
         # Verify conversions were made
-        total_conversions = sum(result['modules_converted'] for result in actual_results)
+        total_conversions = sum(
+            result["modules_converted"] for result in actual_results
+        )
         assert total_conversions > 0
-    
+
     def test_configuration_manager_integration(self, custom_mapping_config, temp_dir):
         """Test configuration manager integration workflow."""
         # Initialize configuration manager
         config_manager = ConfigurationManager()
-        
+
         # Test loading custom mappings
-        custom_mappings = config_manager.load_custom_mappings(str(custom_mapping_config))
-        
-        assert 'package' in custom_mappings
-        assert custom_mappings['package'] == 'ansible.builtin.package'
-        assert 'mysql_db' in custom_mappings
-        assert custom_mappings['mysql_db'] == 'community.mysql.mysql_db'
-        
+        custom_mappings = config_manager.load_custom_mappings(
+            str(custom_mapping_config)
+        )
+
+        assert "package" in custom_mappings
+        assert custom_mappings["package"] == "ansible.builtin.package"
+        assert "mysql_db" in custom_mappings
+        assert custom_mappings["mysql_db"] == "community.mysql.mysql_db"
+
         # Test loading default mappings
         default_mappings = config_manager.load_default_mappings()
-        
+
         assert isinstance(default_mappings, dict)
         assert len(default_mappings) > 0
-        
+
         # Test merging mappings
-        merged_mappings = config_manager.merge_mappings(default_mappings, custom_mappings)
-        
+        merged_mappings = config_manager.merge_mappings(
+            default_mappings, custom_mappings
+        )
+
         assert len(merged_mappings) >= len(custom_mappings)
-        assert merged_mappings['package'] == 'ansible.builtin.package'  # Custom should override
-        
+        assert (
+            merged_mappings["package"] == "ansible.builtin.package"
+        )  # Custom should override
+
         # Test with converter
         converter = FQCNConverter(config_path=custom_mapping_config)
-        
+
         test_content = """---
 - name: Test custom mapping
   custom_module:
     param: value
 """
-        
+
         result = converter.convert_content(test_content)
-        
+
         assert result.success is True
-        assert 'custom.collection.custom_module:' in result.converted_content
-    
+        assert "custom.collection.custom_module:" in result.converted_content
+
     def test_error_handling_workflow_integration(self, temp_dir, custom_mapping_config):
         """Test error handling across all workflow components."""
         # Test with invalid YAML file
         invalid_file = temp_dir / "invalid.yml"
         invalid_file.write_text("---\ninvalid: [\n")
-        
+
         converter = FQCNConverter(config_path=custom_mapping_config)
-        
+
         # Should handle YAML parsing errors gracefully
         with pytest.raises(Exception):  # Should raise appropriate exception
             converter.convert_file(invalid_file)
-        
+
         # Test with non-existent file
         non_existent = temp_dir / "non_existent.yml"
-        
+
         with pytest.raises(Exception):  # Should raise file not found error
             converter.convert_file(non_existent)
-        
+
         # Test batch processor error handling
         batch_processor = BatchProcessor()
-        
+
         # Include invalid project in batch
         projects = [str(temp_dir)]  # Directory with invalid file
         results = batch_processor.process_projects(projects, dry_run=True)
-        
+
         # Should handle errors gracefully and continue processing
         assert len(results) >= 1
         # Some results may fail, but process should complete
-    
-    def test_dry_run_consistency_workflow(self, comprehensive_test_project, custom_mapping_config):
+
+    def test_dry_run_consistency_workflow(
+        self, comprehensive_test_project, custom_mapping_config
+    ):
         """Test dry-run consistency across all components."""
         converter = FQCNConverter(config_path=custom_mapping_config)
         batch_processor = BatchProcessor()
-        
+
         test_file = comprehensive_test_project / "playbooks/deploy.yml"
         original_content = test_file.read_text()
-        
+
         # Test converter dry-run consistency
         dry_result = converter.convert_file(test_file, dry_run=True)
         assert test_file.read_text() == original_content  # File unchanged
-        
+
         actual_result = converter.convert_file(test_file, dry_run=False)
         assert dry_result.changes_made == actual_result.changes_made
         assert dry_result.converted_content == actual_result.converted_content
-        
+
         # Reset file for batch test
         test_file.write_text(original_content)
-        
+
         # Test batch processor dry-run consistency
         projects = [str(comprehensive_test_project)]
-        
+
         dry_batch_results = batch_processor.process_projects(projects, dry_run=True)
         # Verify files unchanged after dry-run
         assert test_file.read_text() == original_content
-        
+
         actual_batch_results = batch_processor.process_projects(projects, dry_run=False)
-        
+
         # Results should be consistent
         assert len(dry_batch_results) == len(actual_batch_results)
         for dry_res, actual_res in zip(dry_batch_results, actual_batch_results):
-            if dry_res['success'] and actual_res['success']:
-                assert dry_res['modules_converted'] == actual_res['modules_converted']
-    
-    def test_comprehensive_workflow_performance(self, comprehensive_test_project, custom_mapping_config):
+            if dry_res["success"] and actual_res["success"]:
+                assert dry_res["modules_converted"] == actual_res["modules_converted"]
+
+    def test_comprehensive_workflow_performance(
+        self, comprehensive_test_project, custom_mapping_config
+    ):
         """Test performance of complete workflow with timing."""
         import time
-        
+
         converter = FQCNConverter(config_path=custom_mapping_config)
         batch_processor = BatchProcessor(max_workers=4)
-        
+
         # Time single file conversion
         test_file = comprehensive_test_project / "site.yml"
-        
+
         start_time = time.time()
         result = converter.convert_file(test_file, dry_run=True)
         single_file_time = time.time() - start_time
-        
+
         assert result.success is True
         assert single_file_time < 5.0  # Should complete within 5 seconds
-        
+
         # Time batch processing
         projects = [str(comprehensive_test_project)]
-        
+
         start_time = time.time()
         batch_results = batch_processor.process_projects(projects, dry_run=True)
         batch_time = time.time() - start_time
-        
+
         assert len(batch_results) >= 1
-        assert all(result['success'] for result in batch_results)
+        assert all(result["success"] for result in batch_results)
         assert batch_time < 30.0  # Should complete within 30 seconds
-        
+
         # Performance should be reasonable
-        total_files = sum(result['files_processed'] for result in batch_results)
+        total_files = sum(result["files_processed"] for result in batch_results)
         if total_files > 0:
             avg_time_per_file = batch_time / total_files
             assert avg_time_per_file < 2.0  # Less than 2 seconds per file on average
@@ -1102,36 +1182,36 @@ all:
 
 class TestWorkflowEdgeCases:
     """Test edge cases and boundary conditions in workflows."""
-    
+
     def test_empty_project_workflow(self, temp_dir):
         """Test workflow with empty project directory."""
         empty_project = temp_dir / "empty_project"
         empty_project.mkdir()
-        
+
         batch_processor = BatchProcessor()
-        
+
         # Should handle empty directory gracefully
         projects = batch_processor.discover_projects(str(empty_project))
         assert len(projects) == 0
-        
+
         results = batch_processor.process_projects([str(empty_project)], dry_run=True)
         assert len(results) == 1
-        assert results[0]['success'] is True  # Should succeed with no files to process
+        assert results[0]["success"] is True  # Should succeed with no files to process
         # Note: Current implementation counts project as 1 file even if empty
         # This is a known limitation in the batch processor's file counting
-        assert results[0]['files_processed'] >= 0
-        assert results[0]['modules_converted'] == 0
-    
+        assert results[0]["files_processed"] >= 0
+        assert results[0]["modules_converted"] == 0
+
     def test_large_file_workflow(self, temp_dir, custom_mapping_config):
         """Test workflow with very large Ansible files."""
         large_file = temp_dir / "large_playbook.yml"
-        
+
         # Create a large playbook with many tasks
         large_content = "---\n"
         large_content += "- name: Large playbook test\n"
         large_content += "  hosts: all\n"
         large_content += "  tasks:\n"
-        
+
         for i in range(1000):  # 1000 tasks
             large_content += f"""    - name: Task {i}
       package:
@@ -1140,21 +1220,22 @@ class TestWorkflowEdgeCases:
       when: condition_{i} | default(false)
     
 """
-        
+
         large_file.write_text(large_content)
-        
+
         converter = FQCNConverter(config_path=custom_mapping_config)
-        
+
         # Should handle large files efficiently
         import time
+
         start_time = time.time()
         result = converter.convert_file(large_file, dry_run=True)
         processing_time = time.time() - start_time
-        
+
         assert result.success is True
         assert result.changes_made == 1000  # Should convert all package modules
         assert processing_time < 10.0  # Should complete within 10 seconds
-    
+
     def test_deeply_nested_project_workflow(self, temp_dir):
         """Test workflow with deeply nested project structure."""
         # Create deeply nested structure
@@ -1162,10 +1243,11 @@ class TestWorkflowEdgeCases:
         for i in range(10):  # 10 levels deep
             deep_path = deep_path / f"level_{i}"
             deep_path.mkdir()
-        
+
         # Create Ansible file at the deepest level
         ansible_file = deep_path / "deep.yml"
-        ansible_file.write_text("""---
+        ansible_file.write_text(
+            """---
 - name: Deep nested playbook
   hosts: all
   tasks:
@@ -1173,23 +1255,24 @@ class TestWorkflowEdgeCases:
       package:
         name: nginx
         state: present
-""")
-        
+"""
+        )
+
         batch_processor = BatchProcessor()
-        
+
         # Should discover and process deeply nested files
         projects = batch_processor.discover_projects(str(temp_dir))
         assert len(projects) >= 1
-        
+
         results = batch_processor.process_projects(projects, dry_run=True)
         assert len(results) >= 1
-        assert any(result['success'] for result in results)
-    
+        assert any(result["success"] for result in results)
+
     def test_mixed_file_types_workflow(self, temp_dir, custom_mapping_config):
         """Test workflow with mixed file types and extensions."""
         project_dir = temp_dir / "mixed_project"
         project_dir.mkdir()
-        
+
         # Create files with different extensions
         files = {
             "playbook.yml": """---
@@ -1219,30 +1302,30 @@ This is not an Ansible file.
             "config.json": """{"key": "value"}""",
             "script.sh": """#!/bin/bash
 echo "Not Ansible"
-"""
+""",
         }
-        
+
         for filename, content in files.items():
             (project_dir / filename).write_text(content)
-        
+
         batch_processor = BatchProcessor()
         converter = FQCNConverter(config_path=custom_mapping_config)
-        
+
         # Should only process Ansible files
         # Note: discover_projects looks for project directories, so we search from parent
         projects = batch_processor.discover_projects(str(temp_dir))
         assert len(projects) >= 1
-        
+
         results = batch_processor.process_projects(projects, dry_run=False)
         assert len(results) >= 1
-        
+
         # Verify only Ansible files were converted
         yml_content = (project_dir / "playbook.yml").read_text()
         yaml_content = (project_dir / "playbook.yaml").read_text()
-        
+
         assert "ansible.builtin.package:" in yml_content
         assert "ansible.builtin.user:" in yaml_content
-        
+
         # Non-Ansible files should be unchanged
         assert (project_dir / "README.md").read_text() == files["README.md"]
         assert (project_dir / "config.json").read_text() == files["config.json"]

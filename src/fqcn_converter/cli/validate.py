@@ -14,10 +14,10 @@ import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
 
-from ..core.validator import ValidationEngine, ValidationResult, ValidationIssue
-from ..exceptions import FQCNConverterError, ValidationError, FileAccessError
+from ..core.validator import ValidationEngine, ValidationIssue, ValidationResult
+from ..exceptions import FileAccessError, FQCNConverterError, ValidationError
 
 
 def add_validate_arguments(parser: argparse.ArgumentParser) -> None:

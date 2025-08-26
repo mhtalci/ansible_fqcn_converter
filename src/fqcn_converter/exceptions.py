@@ -8,7 +8,7 @@ with clear error categorization, actionable error messages, and recovery mechani
 import os
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional, Any, Union
+from typing import Any, Dict, List, Optional, Union
 
 
 class FQCNConverterError(Exception):
@@ -86,7 +86,7 @@ class ConfigurationError(FQCNConverterError):
         config_path: Optional[str] = None,
         missing_keys: Optional[List[str]] = None,
         invalid_values: Optional[Dict[str, str]] = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         # Build detailed error information
         details_parts = []
@@ -161,7 +161,7 @@ class ConversionError(FQCNConverterError):
         line_number: Optional[int] = None,
         column_number: Optional[int] = None,
         original_content: Optional[str] = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         details_parts = []
         suggestions = []
@@ -246,7 +246,7 @@ class ValidationError(FQCNConverterError):
         message: str,
         validation_issues: Optional[List[Dict[str, Any]]] = None,
         file_path: Optional[str] = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         details_parts = []
         suggestions = []
@@ -342,7 +342,7 @@ class BatchProcessingError(FQCNConverterError):
         failed_files: Optional[List[str]] = None,
         successful_files: Optional[List[str]] = None,
         total_files: Optional[int] = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         details_parts = []
         suggestions = []
@@ -461,7 +461,7 @@ class FileAccessError(FQCNConverterError):
         file_path: Optional[str] = None,
         operation: Optional[str] = None,
         os_error: Optional[OSError] = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         details_parts = []
         suggestions = []
@@ -555,7 +555,7 @@ class MappingError(ConfigurationError):
         message: str,
         module_name: Optional[str] = None,
         available_mappings: Optional[List[str]] = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         suggestions = []
         recovery_actions = []

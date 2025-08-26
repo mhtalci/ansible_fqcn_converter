@@ -5,15 +5,15 @@ This module provides functionality for processing multiple Ansible projects
 in parallel with detailed reporting and error handling.
 """
 
-import time
 import logging
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
-from typing import List, Union, Optional, Callable, Dict
 from pathlib import Path
+from typing import Any, Callable, Dict, Iterator, List, Optional, Union
 
-from .converter import FQCNConverter, ConversionResult
 from ..exceptions import BatchProcessingError
+from .converter import ConversionResult, FQCNConverter
 
 
 @dataclass
@@ -53,7 +53,7 @@ class BatchResult:
         """Return the number of project results."""
         return len(self.project_results)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Dict[str, Any]]:
         """Make BatchResult iterable over project results as dictionaries."""
         for result in self.project_results:
             yield {
@@ -66,7 +66,7 @@ class BatchResult:
                 "error_message": None if result.success else "; ".join(result.errors),
             }
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> Dict[str, Any]:
         """Allow indexing into project results as dictionaries."""
         result = self.project_results[index]
         return {

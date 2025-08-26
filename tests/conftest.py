@@ -5,11 +5,12 @@ This module provides common fixtures and configuration for all test modules
 to ensure consistent test setup and teardown.
 """
 
-import pytest
-import tempfile
 import shutil
+import tempfile
 from pathlib import Path
 from unittest.mock import Mock, patch
+
+import pytest
 
 
 @pytest.fixture
@@ -177,43 +178,42 @@ def sample_fqcn_mappings():
     """Sample FQCN mappings for testing."""
     return {
         # Ansible builtin modules
-        'copy': 'ansible.builtin.copy',
-        'file': 'ansible.builtin.file',
-        'template': 'ansible.builtin.template',
-        'service': 'ansible.builtin.service',
-        'systemd': 'ansible.builtin.systemd',
-        'user': 'ansible.builtin.user',
-        'group': 'ansible.builtin.group',
-        'package': 'ansible.builtin.package',
-        'apt': 'ansible.builtin.apt',
-        'yum': 'ansible.builtin.yum',
-        'command': 'ansible.builtin.command',
-        'shell': 'ansible.builtin.shell',
-        'debug': 'ansible.builtin.debug',
-        'set_fact': 'ansible.builtin.set_fact',
-        'include_tasks': 'ansible.builtin.include_tasks',
-        'import_tasks': 'ansible.builtin.import_tasks',
-        'mount': 'ansible.builtin.mount',
-        'cron': 'ansible.builtin.cron',
-        'lineinfile': 'ansible.builtin.lineinfile',
-        'replace': 'ansible.builtin.replace',
-        
+        "copy": "ansible.builtin.copy",
+        "file": "ansible.builtin.file",
+        "template": "ansible.builtin.template",
+        "service": "ansible.builtin.service",
+        "systemd": "ansible.builtin.systemd",
+        "user": "ansible.builtin.user",
+        "group": "ansible.builtin.group",
+        "package": "ansible.builtin.package",
+        "apt": "ansible.builtin.apt",
+        "yum": "ansible.builtin.yum",
+        "command": "ansible.builtin.command",
+        "shell": "ansible.builtin.shell",
+        "debug": "ansible.builtin.debug",
+        "set_fact": "ansible.builtin.set_fact",
+        "include_tasks": "ansible.builtin.include_tasks",
+        "import_tasks": "ansible.builtin.import_tasks",
+        "mount": "ansible.builtin.mount",
+        "cron": "ansible.builtin.cron",
+        "lineinfile": "ansible.builtin.lineinfile",
+        "replace": "ansible.builtin.replace",
         # Community modules
-        'docker_container': 'community.docker.docker_container',
-        'docker_image': 'community.docker.docker_image',
-        'mysql_user': 'community.mysql.mysql_user',
-        'mysql_db': 'community.mysql.mysql_db',
-        'postgresql_user': 'community.postgresql.postgresql_user',
-        'postgresql_db': 'community.postgresql.postgresql_db',
-        'git': 'ansible.builtin.git',
-        'unarchive': 'ansible.builtin.unarchive',
+        "docker_container": "community.docker.docker_container",
+        "docker_image": "community.docker.docker_image",
+        "mysql_user": "community.mysql.mysql_user",
+        "mysql_db": "community.mysql.mysql_db",
+        "postgresql_user": "community.postgresql.postgresql_user",
+        "postgresql_db": "community.postgresql.postgresql_db",
+        "git": "ansible.builtin.git",
+        "unarchive": "ansible.builtin.unarchive",
     }
 
 
 @pytest.fixture
 def mock_config_manager(sample_fqcn_mappings):
     """Mock ConfigurationManager for testing."""
-    with patch('fqcn_converter.config.manager.ConfigurationManager') as mock_class:
+    with patch("fqcn_converter.config.manager.ConfigurationManager") as mock_class:
         mock_instance = Mock()
         mock_instance.load_default_mappings.return_value = sample_fqcn_mappings
         mock_instance.load_custom_mappings.return_value = {}
@@ -226,7 +226,7 @@ def mock_config_manager(sample_fqcn_mappings):
 def ansible_project_structure(temp_dir):
     """Create a complete Ansible project structure for testing."""
     project_dir = temp_dir / "test_project"
-    
+
     # Create directory structure
     (project_dir / "group_vars").mkdir(parents=True)
     (project_dir / "host_vars").mkdir(parents=True)
@@ -235,16 +235,19 @@ def ansible_project_structure(temp_dir):
     (project_dir / "roles" / "nginx" / "templates").mkdir(parents=True)
     (project_dir / "roles" / "nginx" / "vars").mkdir(parents=True)
     (project_dir / "roles" / "nginx" / "defaults").mkdir(parents=True)
-    
+
     # Create playbook files
-    (project_dir / "site.yml").write_text("""---
+    (project_dir / "site.yml").write_text(
+        """---
 - name: Main site playbook
   hosts: all
   roles:
     - nginx
-""")
-    
-    (project_dir / "webservers.yml").write_text("""---
+"""
+    )
+
+    (project_dir / "webservers.yml").write_text(
+        """---
 - name: Configure web servers
   hosts: webservers
   tasks:
@@ -252,10 +255,12 @@ def ansible_project_structure(temp_dir):
       package:
         name: nginx
         state: present
-""")
-    
+"""
+    )
+
     # Create role files
-    (project_dir / "roles" / "nginx" / "tasks" / "main.yml").write_text("""---
+    (project_dir / "roles" / "nginx" / "tasks" / "main.yml").write_text(
+        """---
 - name: Install nginx
   package:
     name: nginx
@@ -265,24 +270,29 @@ def ansible_project_structure(temp_dir):
   service:
     name: nginx
     state: started
-""")
-    
-    (project_dir / "roles" / "nginx" / "handlers" / "main.yml").write_text("""---
+"""
+    )
+
+    (project_dir / "roles" / "nginx" / "handlers" / "main.yml").write_text(
+        """---
 - name: restart nginx
   service:
     name: nginx
     state: restarted
-""")
-    
+"""
+    )
+
     # Create inventory
-    (project_dir / "inventory.ini").write_text("""[webservers]
+    (project_dir / "inventory.ini").write_text(
+        """[webservers]
 web1.example.com
 web2.example.com
 
 [databases]
 db1.example.com
-""")
-    
+"""
+    )
+
     return project_dir
 
 
@@ -292,6 +302,7 @@ def reset_logging():
     yield
     # Reset logging to avoid interference between tests
     import logging
+
     logging.getLogger().handlers.clear()
     logging.getLogger().setLevel(logging.WARNING)
 
@@ -299,25 +310,27 @@ def reset_logging():
 @pytest.fixture
 def cli_args():
     """Factory fixture for creating CLI argument objects."""
+
     def _create_args(**kwargs):
         """Create an argparse.Namespace object with default CLI arguments."""
         defaults = {
-            'verbosity': 'normal',
-            'files': ['test.yml'],
-            'config': None,
-            'dry_run': False,
-            'backup': False,
-            'no_backup': False,
-            'progress': False,
-            'report': None,
-            'skip_validation': False,
-            'lint': False,
-            'force': False,
-            'exclude': None,
+            "verbosity": "normal",
+            "files": ["test.yml"],
+            "config": None,
+            "dry_run": False,
+            "backup": False,
+            "no_backup": False,
+            "progress": False,
+            "report": None,
+            "skip_validation": False,
+            "lint": False,
+            "force": False,
+            "exclude": None,
         }
         defaults.update(kwargs)
-        
+
         from argparse import Namespace
+
         return Namespace(**defaults)
-    
+
     return _create_args

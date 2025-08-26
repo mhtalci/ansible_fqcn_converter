@@ -7,16 +7,17 @@ incomplete conversions.
 """
 
 import re
-import yaml
 from dataclasses import dataclass, field
-from typing import List, Union, Dict, Any, Set
 from pathlib import Path
+from typing import Any, Dict, List, Set, Union
+
+import yaml
 
 from ..config.manager import ConfigurationManager
 from ..exceptions import (
+    FileAccessError,
     ValidationError,
     YAMLParsingError,
-    FileAccessError,
 )
 from ..utils.logging import get_logger
 
@@ -423,13 +424,13 @@ class ValidationEngine:
 
         return True
 
-    def _count_modules(self, yaml_data) -> tuple:
+    def _count_modules(self, yaml_data: Any) -> tuple[int, int, int]:
         """Count total modules, FQCN modules, and short modules."""
         total_modules = 0
         fqcn_modules = 0
         short_modules = 0
 
-        def count_in_structure(data):
+        def count_in_structure(data: Any) -> None:
             nonlocal total_modules, fqcn_modules, short_modules
 
             if isinstance(data, dict):

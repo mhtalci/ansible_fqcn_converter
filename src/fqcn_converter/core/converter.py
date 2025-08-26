@@ -7,17 +7,18 @@ collection names (FQCNs).
 """
 
 import re
-import yaml
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Union, Any, Pattern
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Pattern, Union
+
+import yaml
 
 from ..config.manager import ConfigurationManager
 from ..exceptions import (
-    ConversionError,
     ConfigurationError,
-    YAMLParsingError,
+    ConversionError,
     FileAccessError,
+    YAMLParsingError,
 )
 from ..utils.logging import get_logger
 
@@ -27,7 +28,9 @@ logger = get_logger(__name__)
 TASK_START_PATTERN = re.compile(r"^\s*-\s+name\s*:")
 MODULE_PATTERN = re.compile(r"^\s*-?\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*:")
 YAML_KEY_PATTERN = re.compile(r"^\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*:")
-FQCN_PATTERN = re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]*\.[a-zA-Z_][a-zA-Z0-9_]*\.[a-zA-Z_][a-zA-Z0-9_]*$")
+FQCN_PATTERN = re.compile(
+    r"^[a-zA-Z_][a-zA-Z0-9_]*\.[a-zA-Z_][a-zA-Z0-9_]*\.[a-zA-Z_][a-zA-Z0-9_]*$"
+)
 
 
 @dataclass
@@ -180,7 +183,7 @@ class FQCNConverter:
         """Get FQCN mapping for a module with caching for performance."""
         if module_name in self._mapping_cache:
             return self._mapping_cache[module_name]
-        
+
         fqcn = self._mappings.get(module_name)
         self._mapping_cache[module_name] = fqcn
         return fqcn
@@ -414,11 +417,11 @@ class FQCNConverter:
         }
 
         # Use the parsed YAML structure to identify actual modules vs parameters
-        def find_modules_in_tasks(task_list):
+        def find_modules_in_tasks(task_list: Any) -> List[str]:
             """Find actual module usage from parsed YAML structure."""
             modules_found = []
 
-            def process_task(task, task_path=""):
+            def process_task(task: Any, task_path: str = "") -> None:
                 if not isinstance(task, dict):
                     return
 
@@ -430,7 +433,10 @@ class FQCNConverter:
 
                 # Find the actual module in this task
                 for key, value in task.items():
-                    if key not in ansible_directives and self._get_fqcn_mapping(key) is not None:
+                    if (
+                        key not in ansible_directives
+                        and self._get_fqcn_mapping(key) is not None
+                    ):
                         modules_found.append(
                             {
                                 "module": key,

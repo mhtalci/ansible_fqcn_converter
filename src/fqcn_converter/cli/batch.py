@@ -14,11 +14,11 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import List, Dict, Any, Optional, Set
+from typing import Any, Dict, List, Optional, Set
 
-from ..core.converter import FQCNConverter, ConversionResult
+from ..core.converter import ConversionResult, FQCNConverter
 from ..core.validator import ValidationEngine, ValidationResult
-from ..exceptions import FQCNConverterError, ConfigurationError
+from ..exceptions import ConfigurationError, FQCNConverterError
 
 
 def add_batch_arguments(parser: argparse.ArgumentParser) -> None:

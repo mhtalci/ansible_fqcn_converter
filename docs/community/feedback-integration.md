@@ -1,6 +1,9 @@
 # Community Feedback Integration
 
-This document describes how community feedback is collected and integrated into the FQCN Converter development process.
+[![GitHub Issues](https://img.shields.io/github/issues/mhtalci/ansible_fqcn_converter)](https://github.com/mhtalci/ansible_fqcn_converter/issues)
+[![GitHub Discussions](https://img.shields.io/github/discussions/mhtalci/ansible_fqcn_converter)](https://github.com/mhtalci/ansible_fqcn_converter/discussions)
+
+This document describes how community feedback is collected and integrated into the FQCN Converter development process for our production-ready v0.1.0 release and beyond.
 
 ## Feedback Channels
 

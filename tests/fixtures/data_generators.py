@@ -5,81 +5,91 @@ This module provides generators for creating test data with various
 edge cases, boundary conditions, and stress testing scenarios.
 """
 
+import itertools
 import random
 import string
-import itertools
-from typing import List, Dict, Any, Generator, Optional, Tuple
 from pathlib import Path
+from typing import Any, Dict, Generator, List, Optional, Tuple
 
 
 class PlaybookGenerator:
     """Generator for Ansible playbooks with various characteristics."""
-    
+
     def __init__(self, seed: Optional[int] = None):
         """Initialize generator with optional random seed."""
         if seed is not None:
             random.seed(seed)
-    
+
     def generate_simple_playbook(self, num_tasks: int = 5) -> str:
         """Generate a simple playbook with specified number of tasks."""
-        modules = ['package', 'service', 'copy', 'file', 'user', 'group', 'command', 'template', 'debug']
-        
+        modules = [
+            "package",
+            "service",
+            "copy",
+            "file",
+            "user",
+            "group",
+            "command",
+            "template",
+            "debug",
+        ]
+
         tasks = []
         for i in range(num_tasks):
             module = random.choice(modules)
             task_name = f"Task {i + 1} - {module}"
-            
-            if module == 'package':
+
+            if module == "package":
                 task = f"""  - name: {task_name}
     {module}:
       name: "package_{i}"
       state: present"""
-            elif module == 'service':
+            elif module == "service":
                 task = f"""  - name: {task_name}
     {module}:
       name: "service_{i}"
       state: started
       enabled: yes"""
-            elif module == 'copy':
+            elif module == "copy":
                 task = f"""  - name: {task_name}
     {module}:
       src: "source_{i}.txt"
       dest: "/tmp/dest_{i}.txt"
       mode: '0644'"""
-            elif module == 'file':
+            elif module == "file":
                 task = f"""  - name: {task_name}
     {module}:
       path: "/tmp/file_{i}"
       state: touch
       mode: '0644'"""
-            elif module == 'user':
+            elif module == "user":
                 task = f"""  - name: {task_name}
     {module}:
       name: "user_{i}"
       state: present
       shell: /bin/bash"""
-            elif module == 'group':
+            elif module == "group":
                 task = f"""  - name: {task_name}
     {module}:
       name: "group_{i}"
       state: present"""
-            elif module == 'command':
+            elif module == "command":
                 task = f"""  - name: {task_name}
     {module}: "echo 'Command {i}'"
     changed_when: false"""
-            elif module == 'template':
+            elif module == "template":
                 task = f"""  - name: {task_name}
     {module}:
       src: "template_{i}.j2"
       dest: "/etc/config_{i}.conf"
       mode: '0644'"""
-            elif module == 'debug':
+            elif module == "debug":
                 task = f"""  - name: {task_name}
     {module}:
-      msg: "Debug message {i}""""
-            
+      msg: "Debug message {i}\""""
+
             tasks.append(task)
-        
+
         return f"""---
 - name: Generated playbook with {num_tasks} tasks
   hosts: all
@@ -88,15 +98,17 @@ class PlaybookGenerator:
   tasks:
 {chr(10).join(tasks)}
 """
-    
-    def generate_complex_playbook(self, num_plays: int = 3, tasks_per_play: int = 5) -> str:
+
+    def generate_complex_playbook(
+        self, num_plays: int = 3, tasks_per_play: int = 5
+    ) -> str:
         """Generate a complex multi-play playbook."""
         plays = []
-        
+
         for play_num in range(num_plays):
-            host_groups = ['webservers', 'databases', 'loadbalancers', 'monitoring']
+            host_groups = ["webservers", "databases", "loadbalancers", "monitoring"]
             host_group = random.choice(host_groups)
-            
+
             play = f"""- name: Play {play_num + 1} - {host_group}
   hosts: {host_group}
   become: yes
@@ -120,16 +132,16 @@ class PlaybookGenerator:
         msg: "Completed play {{{{ play_number }}}} for {{{{ target_group }}}}"
 """
             plays.append(play)
-        
+
         return f"""---
 {chr(10).join(plays)}
 """
-    
+
     def _generate_tasks_for_play(self, num_tasks: int, play_num: int) -> List[str]:
         """Generate tasks for a specific play."""
-        modules = ['package', 'service', 'copy', 'file', 'user', 'template', 'command']
+        modules = ["package", "service", "copy", "file", "user", "template", "command"]
         tasks = []
-        
+
         for i in range(num_tasks):
             module = random.choice(modules)
             task = f"""    - name: Play {play_num + 1} Task {i + 1}
@@ -137,20 +149,20 @@ class PlaybookGenerator:
         name: "play_{play_num}_item_{i}"
         state: present"""
             tasks.append(task)
-        
+
         return tasks
-    
-    def generate_with_variables(self, complexity: str = 'medium') -> str:
+
+    def generate_with_variables(self, complexity: str = "medium") -> str:
         """Generate playbook with various variable complexity levels."""
-        if complexity == 'simple':
+        if complexity == "simple":
             return self._generate_simple_variables_playbook()
-        elif complexity == 'medium':
+        elif complexity == "medium":
             return self._generate_medium_variables_playbook()
-        elif complexity == 'complex':
+        elif complexity == "complex":
             return self._generate_complex_variables_playbook()
         else:
             raise ValueError("Complexity must be 'simple', 'medium', or 'complex'")
-    
+
     def _generate_simple_variables_playbook(self) -> str:
         """Generate playbook with simple variables."""
         return """---
@@ -182,7 +194,7 @@ class PlaybookGenerator:
         dest: "/etc/{{ app_name }}/config"
         mode: '0644'
 """
-    
+
     def _generate_medium_variables_playbook(self) -> str:
         """Generate playbook with medium complexity variables."""
         return """---
@@ -244,7 +256,7 @@ class PlaybookGenerator:
         enabled: "{{ item.enabled }}"
       loop: "{{ services }}"
 """
-    
+
     def _generate_complex_variables_playbook(self) -> str:
         """Generate playbook with complex nested variables."""
         return """---
@@ -336,29 +348,35 @@ class PlaybookGenerator:
 
 class EdgeCaseGenerator:
     """Generator for edge cases and boundary conditions."""
-    
+
     @staticmethod
     def generate_malformed_yaml_cases() -> List[Tuple[str, str]]:
         """Generate various malformed YAML cases."""
         cases = [
-            ("unclosed_list", """---
+            (
+                "unclosed_list",
+                """---
 - name: Unclosed list
   hosts: all
   tasks:
     - name: Test
       package:
         name: [nginx, apache
-"""),
-            
-            ("unclosed_dict", """---
+""",
+            ),
+            (
+                "unclosed_dict",
+                """---
 - name: Unclosed dict
   hosts: all
   tasks:
     - name: Test
       package: {name: nginx, state: present
-"""),
-            
-            ("invalid_indentation", """---
+""",
+            ),
+            (
+                "invalid_indentation",
+                """---
 - name: Invalid indentation
   hosts: all
   tasks:
@@ -366,9 +384,11 @@ class EdgeCaseGenerator:
       package:
         name: nginx
       state: present
-"""),
-            
-            ("mixed_tabs_spaces", """---
+""",
+            ),
+            (
+                "mixed_tabs_spaces",
+                """---
 - name: Mixed tabs and spaces
   hosts: all
   tasks:
@@ -376,9 +396,11 @@ class EdgeCaseGenerator:
       package:
         name: nginx
 \t\tstate: present
-"""),
-            
-            ("invalid_yaml_syntax", """---
+""",
+            ),
+            (
+                "invalid_yaml_syntax",
+                """---
 - name: Invalid syntax
   hosts: all
   tasks:
@@ -387,16 +409,19 @@ class EdgeCaseGenerator:
         name: nginx
         state: present
       invalid: [
-"""),
+""",
+            ),
         ]
-        
+
         return cases
-    
+
     @staticmethod
     def generate_unicode_cases() -> List[Tuple[str, str]]:
         """Generate Unicode and encoding edge cases."""
         cases = [
-            ("basic_unicode", """---
+            (
+                "basic_unicode",
+                """---
 - name: Unicode test 🚀
   hosts: all
   vars:
@@ -406,9 +431,11 @@ class EdgeCaseGenerator:
       copy:
         content: "{{ message }}"
         dest: /tmp/unicode.txt
-"""),
-            
-            ("emoji_heavy", """---
+""",
+            ),
+            (
+                "emoji_heavy",
+                """---
 - name: Emoji heavy playbook 🎭🎪🎨
   hosts: all
   tasks:
@@ -421,9 +448,11 @@ class EdgeCaseGenerator:
       service:
         name: nginx
         state: started
-"""),
-            
-            ("mixed_scripts", """---
+""",
+            ),
+            (
+                "mixed_scripts",
+                """---
 - name: Mixed scripts test
   hosts: all
   vars:
@@ -438,19 +467,23 @@ class EdgeCaseGenerator:
       debug:
         msg: "{{ item.value }}"
       loop: "{{ messages | dict2items }}"
-"""),
+""",
+            ),
         ]
-        
+
         return cases
-    
+
     @staticmethod
     def generate_large_content_cases() -> List[Tuple[str, str]]:
         """Generate cases with large content for performance testing."""
         cases = []
-        
+
         # Very long lines
         long_line = "a" * 1000
-        cases.append(("very_long_line", f"""---
+        cases.append(
+            (
+                "very_long_line",
+                f"""---
 - name: Very long line test
   hosts: all
   tasks:
@@ -458,25 +491,37 @@ class EdgeCaseGenerator:
       copy:
         content: "{long_line}"
         dest: /tmp/long_content.txt
-"""))
-        
+""",
+            )
+        )
+
         # Many tasks
         many_tasks = []
         for i in range(100):
-            many_tasks.append(f"""    - name: Task {i}
+            many_tasks.append(
+                f"""    - name: Task {i}
       package:
         name: "package_{i}"
-        state: present""")
-        
-        cases.append(("many_tasks", f"""---
+        state: present"""
+            )
+
+        cases.append(
+            (
+                "many_tasks",
+                f"""---
 - name: Many tasks playbook
   hosts: all
   tasks:
 {chr(10).join(many_tasks)}
-"""))
-        
+""",
+            )
+        )
+
         # Deep nesting
-        cases.append(("deep_nesting", """---
+        cases.append(
+            (
+                "deep_nesting",
+                """---
 - name: Deep nesting test
   hosts: all
   vars:
@@ -495,39 +540,50 @@ class EdgeCaseGenerator:
     - name: Access deeply nested value
       debug:
         msg: "{{ level1.level2.level3.level4.level5.level6.level7.level8.level9.level10.value }}"
-"""))
-        
+""",
+            )
+        )
+
         return cases
-    
+
     @staticmethod
     def generate_boundary_conditions() -> List[Tuple[str, str]]:
         """Generate boundary condition test cases."""
         cases = [
             ("empty_playbook", "---\n"),
-            
-            ("only_comments", """# This is a comment-only file
+            (
+                "only_comments",
+                """# This is a comment-only file
 # No actual Ansible content
 # Should be handled gracefully
-"""),
-            
-            ("minimal_playbook", """---
+""",
+            ),
+            (
+                "minimal_playbook",
+                """---
 - hosts: all
-"""),
-            
-            ("no_tasks", """---
+""",
+            ),
+            (
+                "no_tasks",
+                """---
 - name: No tasks playbook
   hosts: all
   vars:
     test_var: value
-"""),
-            
-            ("empty_tasks", """---
+""",
+            ),
+            (
+                "empty_tasks",
+                """---
 - name: Empty tasks
   hosts: all
   tasks: []
-"""),
-            
-            ("single_character_names", """---
+""",
+            ),
+            (
+                "single_character_names",
+                """---
 - name: Single character test
   hosts: all
   tasks:
@@ -540,97 +596,117 @@ class EdgeCaseGenerator:
       service:
         name: b
         state: started
-"""),
+""",
+            ),
         ]
-        
+
         return cases
 
 
 class StressTestGenerator:
     """Generator for stress testing scenarios."""
-    
+
     @staticmethod
-    def generate_large_project(num_roles: int = 50, tasks_per_role: int = 20) -> Dict[str, Dict[str, str]]:
+    def generate_large_project(
+        num_roles: int = 50, tasks_per_role: int = 20
+    ) -> Dict[str, Dict[str, str]]:
         """Generate a large project structure for stress testing."""
         project = {}
-        
+
         # Generate main playbooks
-        project['playbooks'] = {}
-        
+        project["playbooks"] = {}
+
         # Site playbook
         role_list = [f"role_{i:03d}" for i in range(num_roles)]
-        project['playbooks']['site.yml'] = f"""---
+        project["playbooks"][
+            "site.yml"
+        ] = f"""---
 - name: Main site deployment
   hosts: all
   become: yes
   roles:
 {chr(10).join(f'    - {role}' for role in role_list)}
 """
-        
+
         # Group-specific playbooks
         for i in range(0, num_roles, 10):
-            group_roles = role_list[i:i+10]
-            project['playbooks'][f'group_{i//10}.yml'] = f"""---
+            group_roles = role_list[i : i + 10]
+            project["playbooks"][
+                f"group_{i//10}.yml"
+            ] = f"""---
 - name: Group {i//10} deployment
   hosts: "group_{i//10}"
   become: yes
   roles:
 {chr(10).join(f'    - {role}' for role in group_roles)}
 """
-        
+
         # Generate roles
-        project['roles'] = {}
-        modules = ['package', 'service', 'copy', 'file', 'user', 'group', 'template', 'command', 'shell', 'debug']
-        
+        project["roles"] = {}
+        modules = [
+            "package",
+            "service",
+            "copy",
+            "file",
+            "user",
+            "group",
+            "template",
+            "command",
+            "shell",
+            "debug",
+        ]
+
         for i in range(num_roles):
             role_name = f"role_{i:03d}"
-            
+
             # Generate tasks
             tasks = []
             for j in range(tasks_per_role):
                 module = modules[j % len(modules)]
-                tasks.append(f"""- name: Task {j} for {role_name}
+                tasks.append(
+                    f"""- name: Task {j} for {role_name}
   {module}:
     name: "{role_name}_item_{j}"
-    state: present""")
-            
-            project['roles'][role_name] = {
-                'tasks/main.yml': f"---\n{chr(10).join(tasks)}",
-                'handlers/main.yml': f"""---
+    state: present"""
+                )
+
+            project["roles"][role_name] = {
+                "tasks/main.yml": f"---\n{chr(10).join(tasks)}",
+                "handlers/main.yml": f"""---
 - name: restart {role_name}
   service:
     name: "{role_name}"
     state: restarted""",
-                'vars/main.yml': f"""---
+                "vars/main.yml": f"""---
 {role_name}_enabled: true
 {role_name}_port: {8000 + i}
 {role_name}_config:
   setting1: value1
   setting2: value2""",
-                'defaults/main.yml': f"""---
+                "defaults/main.yml": f"""---
 {role_name}_package: "{role_name}-package"
 {role_name}_service: "{role_name}-service"
 {role_name}_user: "{role_name}-user"
 {role_name}_group: "{role_name}-group"
-"""
+""",
             }
-        
+
         return project
-    
+
     @staticmethod
     def generate_memory_stress_content(size_mb: int = 10) -> str:
         """Generate content designed to stress memory usage."""
         # Calculate approximate content size
         target_size = size_mb * 1024 * 1024  # Convert to bytes
-        
+
         # Generate large variable content
         large_string = "x" * 1000  # 1KB string
         num_vars = target_size // 2000  # Approximate number of variables needed
-        
+
         vars_section = []
         for i in range(num_vars):
             vars_section.append(f'  large_var_{i}: "{large_string}_{i}"')
-        
+
         return f"""---
 - name: Memory stress test playbook
   hosts: all
@@ -648,12 +724,12 @@ class StressTestGenerator:
         dest: "/tmp/large_file_{i}.txt"
       loop: "{{{{ range(0, {min(100, num_vars)}) | list }}}}"
 """
-    
+
     @staticmethod
     def generate_concurrent_test_files(num_files: int = 100) -> List[Tuple[str, str]]:
         """Generate multiple files for concurrent processing tests."""
         files = []
-        
+
         for i in range(num_files):
             filename = f"concurrent_test_{i:03d}.yml"
             content = f"""---
@@ -681,224 +757,226 @@ class StressTestGenerator:
         msg: "Processing file {i}"
 """
             files.append((filename, content))
-        
+
         return files
 
 
 class RandomContentGenerator:
     """Generator for random content with controlled characteristics."""
-    
+
     def __init__(self, seed: Optional[int] = None):
         """Initialize with optional random seed for reproducible results."""
         if seed is not None:
             random.seed(seed)
-    
-    def generate_random_playbook(self, 
-                                min_tasks: int = 1, 
-                                max_tasks: int = 10,
-                                include_vars: bool = True,
-                                include_handlers: bool = True) -> str:
+
+    def generate_random_playbook(
+        self,
+        min_tasks: int = 1,
+        max_tasks: int = 10,
+        include_vars: bool = True,
+        include_handlers: bool = True,
+    ) -> str:
         """Generate a random playbook with specified constraints."""
         num_tasks = random.randint(min_tasks, max_tasks)
-        
+
         # Random playbook name
-        adjectives = ['simple', 'complex', 'advanced', 'basic', 'custom', 'special']
-        nouns = ['deployment', 'setup', 'configuration', 'installation', 'management']
+        adjectives = ["simple", "complex", "advanced", "basic", "custom", "special"]
+        nouns = ["deployment", "setup", "configuration", "installation", "management"]
         playbook_name = f"{random.choice(adjectives).title()} {random.choice(nouns)}"
-        
+
         # Random host group
-        host_groups = ['all', 'webservers', 'databases', 'loadbalancers', 'workers']
+        host_groups = ["all", "webservers", "databases", "loadbalancers", "workers"]
         hosts = random.choice(host_groups)
-        
+
         playbook = f"""---
 - name: {playbook_name}
   hosts: {hosts}
   become: {random.choice(['yes', 'no'])}
   gather_facts: {random.choice(['yes', 'no'])}
 """
-        
+
         # Add variables if requested
         if include_vars:
             playbook += self._generate_random_vars()
-        
+
         # Add tasks
         playbook += "\n  tasks:\n"
         for i in range(num_tasks):
             playbook += self._generate_random_task(i)
-        
+
         # Add handlers if requested
         if include_handlers and random.choice([True, False]):
             playbook += self._generate_random_handlers()
-        
+
         return playbook
-    
+
     def _generate_random_vars(self) -> str:
         """Generate random variables section."""
         var_types = [
-            ('string', lambda: f'"{self._random_string()}"'),
-            ('number', lambda: str(random.randint(1, 1000))),
-            ('boolean', lambda: random.choice(['true', 'false'])),
-            ('list', lambda: f"[{', '.join([f'item_{i}' for i in range(random.randint(1, 5))])}]"),
+            ("string", lambda: f'"{self._random_string()}"'),
+            ("number", lambda: str(random.randint(1, 1000))),
+            ("boolean", lambda: random.choice(["true", "false"])),
+            (
+                "list",
+                lambda: f"[{', '.join([f'item_{i}' for i in range(random.randint(1, 5))])}]",
+            ),
         ]
-        
+
         num_vars = random.randint(1, 5)
         vars_section = "\n  vars:\n"
-        
+
         for i in range(num_vars):
             var_name = f"var_{i}"
             var_type, generator = random.choice(var_types)
             var_value = generator()
             vars_section += f"    {var_name}: {var_value}\n"
-        
+
         return vars_section
-    
+
     def _generate_random_task(self, task_num: int) -> str:
         """Generate a random task."""
         modules = [
-            ('package', self._generate_package_task),
-            ('service', self._generate_service_task),
-            ('copy', self._generate_copy_task),
-            ('file', self._generate_file_task),
-            ('user', self._generate_user_task),
-            ('group', self._generate_group_task),
-            ('command', self._generate_command_task),
-            ('debug', self._generate_debug_task),
+            ("package", self._generate_package_task),
+            ("service", self._generate_service_task),
+            ("copy", self._generate_copy_task),
+            ("file", self._generate_file_task),
+            ("user", self._generate_user_task),
+            ("group", self._generate_group_task),
+            ("command", self._generate_command_task),
+            ("debug", self._generate_debug_task),
         ]
-        
+
         module_name, generator = random.choice(modules)
         return generator(task_num)
-    
+
     def _generate_package_task(self, task_num: int) -> str:
         """Generate random package task."""
-        packages = ['nginx', 'apache2', 'mysql-server', 'postgresql', 'redis', 'nodejs', 'python3']
+        packages = [
+            "nginx",
+            "apache2",
+            "mysql-server",
+            "postgresql",
+            "redis",
+            "nodejs",
+            "python3",
+        ]
         package = random.choice(packages)
-        state = random.choice(['present', 'latest', 'absent'])
-        
+        state = random.choice(["present", "latest", "absent"])
+
         return f"""    - name: Task {task_num} - Manage package {package}
       package:
         name: {package}
         state: {state}
 """
-    
+
     def _generate_service_task(self, task_num: int) -> str:
         """Generate random service task."""
-        services = ['nginx', 'apache2', 'mysql', 'postgresql', 'redis', 'ssh']
+        services = ["nginx", "apache2", "mysql", "postgresql", "redis", "ssh"]
         service = random.choice(services)
-        state = random.choice(['started', 'stopped', 'restarted'])
-        enabled = random.choice(['yes', 'no'])
-        
+        state = random.choice(["started", "stopped", "restarted"])
+        enabled = random.choice(["yes", "no"])
+
         return f"""    - name: Task {task_num} - Manage service {service}
       service:
         name: {service}
         state: {state}
         enabled: {enabled}
 """
-    
+
     def _generate_copy_task(self, task_num: int) -> str:
         """Generate random copy task."""
         src = f"source_{task_num}.txt"
         dest = f"/tmp/dest_{task_num}.txt"
-        mode = random.choice(['0644', '0755', '0600', '0640'])
-        
+        mode = random.choice(["0644", "0755", "0600", "0640"])
+
         return f"""    - name: Task {task_num} - Copy file
       copy:
         src: {src}
         dest: {dest}
         mode: '{mode}'
 """
-    
+
     def _generate_file_task(self, task_num: int) -> str:
         """Generate random file task."""
         path = f"/tmp/file_{task_num}"
-        state = random.choice(['touch', 'directory', 'absent'])
-        mode = random.choice(['0644', '0755', '0700'])
-        
+        state = random.choice(["touch", "directory", "absent"])
+        mode = random.choice(["0644", "0755", "0700"])
+
         return f"""    - name: Task {task_num} - Manage file
       file:
         path: {path}
         state: {state}
         mode: '{mode}'
 """
-    
+
     def _generate_user_task(self, task_num: int) -> str:
         """Generate random user task."""
         username = f"user_{task_num}"
-        state = random.choice(['present', 'absent'])
-        shell = random.choice(['/bin/bash', '/bin/sh', '/bin/false'])
-        
+        state = random.choice(["present", "absent"])
+        shell = random.choice(["/bin/bash", "/bin/sh", "/bin/false"])
+
         return f"""    - name: Task {task_num} - Manage user {username}
       user:
         name: {username}
         state: {state}
         shell: {shell}
 """
-    
+
     def _generate_group_task(self, task_num: int) -> str:
         """Generate random group task."""
         groupname = f"group_{task_num}"
-        state = random.choice(['present', 'absent'])
-        
+        state = random.choice(["present", "absent"])
+
         return f"""    - name: Task {task_num} - Manage group {groupname}
       group:
         name: {groupname}
         state: {state}
 """
-    
+
     def _generate_command_task(self, task_num: int) -> str:
         """Generate random command task."""
-        commands = [
-            'echo "Hello World"',
-            'ls -la /tmp',
-            'whoami',
-            'date',
-            'uptime'
-        ]
+        commands = ['echo "Hello World"', "ls -la /tmp", "whoami", "date", "uptime"]
         command = random.choice(commands)
-        
+
         return f"""    - name: Task {task_num} - Run command
       command: {command}
       changed_when: false
 """
-    
+
     def _generate_debug_task(self, task_num: int) -> str:
         """Generate random debug task."""
         messages = [
             f"Debug message {task_num}",
             f"Task {task_num} executed",
             f"Processing item {task_num}",
-            f"Status update {task_num}"
+            f"Status update {task_num}",
         ]
         message = random.choice(messages)
-        
+
         return f"""    - name: Task {task_num} - Debug message
       debug:
         msg: "{message}"
 """
-    
+
     def _generate_random_handlers(self) -> str:
         """Generate random handlers section."""
-        handlers = [
-            "restart nginx",
-            "reload apache",
-            "restart mysql",
-            "reload systemd"
-        ]
-        
+        handlers = ["restart nginx", "reload apache", "restart mysql", "reload systemd"]
+
         num_handlers = random.randint(1, 3)
         handlers_section = "\n  handlers:\n"
-        
+
         for i in range(num_handlers):
             handler_name = random.choice(handlers)
             service_name = handler_name.split()[-1]  # Extract service name
-            
+
             handlers_section += f"""    - name: {handler_name}
       service:
         name: {service_name}
         state: restarted
 """
-        
+
         return handlers_section
-    
+
     def _random_string(self, length: int = 8) -> str:
         """Generate random string of specified length."""
-        return ''.join(random.choices(string.ascii_lowercase, k=length))
+        return "".join(random.choices(string.ascii_lowercase, k=length))

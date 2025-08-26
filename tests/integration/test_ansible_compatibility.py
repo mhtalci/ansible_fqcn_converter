@@ -5,12 +5,13 @@ These tests validate compatibility across different Ansible versions,
 collection formats, and syntax variations to ensure broad compatibility.
 """
 
-import pytest
-import tempfile
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
+
+import pytest
 
 from fqcn_converter.core.converter import FQCNConverter
 from fqcn_converter.core.validator import ValidationEngine
@@ -18,7 +19,7 @@ from fqcn_converter.core.validator import ValidationEngine
 
 class AnsibleVersionTestData:
     """Test data for different Ansible versions and formats."""
-    
+
     @staticmethod
     def get_ansible_2_9_playbook() -> str:
         """Ansible 2.9 style playbook with legacy syntax."""
@@ -539,7 +540,6 @@ class AnsibleVersionTestData:
     - service: name=httpd state=started enabled=yes
     - copy: src=file.txt dest=/tmp/file.txt mode=0644
 """,
-            
             "with_items_syntax": """---
 - hosts: all
   tasks:
@@ -556,7 +556,6 @@ class AnsibleVersionTestData:
         alice: admin
         bob: users
 """,
-            
             "sudo_syntax": """---
 - hosts: all
   sudo: yes
@@ -567,7 +566,6 @@ class AnsibleVersionTestData:
       package: name=vim state=present
     - service: name=sshd state=restarted
 """,
-            
             "bare_variables": """---
 - hosts: all
   vars:
@@ -576,185 +574,189 @@ class AnsibleVersionTestData:
   tasks:
     - yum: name={{ packages }} state=present
     - service: name=nginx state=started
-"""
+""",
         }
 
 
 class TestAnsibleVersionCompatibility:
     """Test compatibility across different Ansible versions."""
-    
+
     def test_ansible_2_9_compatibility(self, temp_dir):
         """Test conversion of Ansible 2.9 style playbooks."""
         converter = FQCNConverter()
-        
+
         playbook_file = temp_dir / "ansible_2_9.yml"
         playbook_file.write_text(AnsibleVersionTestData.get_ansible_2_9_playbook())
-        
+
         result = converter.convert_file(playbook_file, dry_run=False)
-        
+
         assert result.success is True
         assert result.changes_made > 0
-        
+
         converted_content = playbook_file.read_text()
-        
+
         # Verify key conversions
         expected_conversions = [
-            'ansible.builtin.yum:',
-            'ansible.builtin.copy:',
-            'ansible.builtin.service:',
-            'ansible.builtin.user:',
-            'ansible.builtin.file:',
-            'ansible.builtin.command:',
-            'community.mysql.mysql_db:',
-            'community.mysql.mysql_user:'
+            "ansible.builtin.yum:",
+            "ansible.builtin.copy:",
+            "ansible.builtin.service:",
+            "ansible.builtin.user:",
+            "ansible.builtin.file:",
+            "ansible.builtin.command:",
+            "community.mysql.mysql_db:",
+            "community.mysql.mysql_user:",
         ]
-        
+
         for conversion in expected_conversions:
             assert conversion in converted_content, f"Missing conversion: {conversion}"
-        
+
         # Verify FQCN conversion occurred (syntax modernization is separate concern)
-        assert 'ansible.builtin.yum: update_cache=' in converted_content
-        assert 'ansible.builtin.yum: name=' in converted_content
-        assert 'ansible.builtin.service: name=' in converted_content
-        assert 'ansible.builtin.copy: src=' in converted_content
-    
+        assert "ansible.builtin.yum: update_cache=" in converted_content
+        assert "ansible.builtin.yum: name=" in converted_content
+        assert "ansible.builtin.service: name=" in converted_content
+        assert "ansible.builtin.copy: src=" in converted_content
+
     def test_ansible_2_10_compatibility(self, temp_dir):
         """Test conversion of Ansible 2.10 style playbooks."""
         converter = FQCNConverter()
-        
+
         playbook_file = temp_dir / "ansible_2_10.yml"
         playbook_file.write_text(AnsibleVersionTestData.get_ansible_2_10_playbook())
-        
+
         result = converter.convert_file(playbook_file, dry_run=False)
-        
+
         assert result.success is True
         assert result.changes_made > 0
-        
+
         converted_content = playbook_file.read_text()
-        
+
         # Verify conversions
         expected_conversions = [
-            'ansible.builtin.package:',
-            'ansible.builtin.template:',
-            'ansible.builtin.systemd:',
-            'ansible.builtin.file:',
-            'ansible.builtin.command:',
-            'community.general.sefcontext:',
-            'ansible.posix.firewalld:',
-            'community.mysql.mysql_db:',
-            'community.mysql.mysql_user:'
+            "ansible.builtin.package:",
+            "ansible.builtin.template:",
+            "ansible.builtin.systemd:",
+            "ansible.builtin.file:",
+            "ansible.builtin.command:",
+            "community.general.sefcontext:",
+            "ansible.posix.firewalld:",
+            "community.mysql.mysql_db:",
+            "community.mysql.mysql_user:",
         ]
-        
+
         for conversion in expected_conversions:
             assert conversion in converted_content, f"Missing conversion: {conversion}"
-    
+
     def test_ansible_core_2_12_compatibility(self, temp_dir):
         """Test conversion of modern ansible-core playbooks."""
         converter = FQCNConverter()
-        
+
         playbook_file = temp_dir / "ansible_core_2_12.yml"
-        playbook_file.write_text(AnsibleVersionTestData.get_ansible_core_2_12_playbook())
-        
+        playbook_file.write_text(
+            AnsibleVersionTestData.get_ansible_core_2_12_playbook()
+        )
+
         result = converter.convert_file(playbook_file, dry_run=False)
-        
+
         assert result.success is True
         assert result.changes_made > 0
-        
+
         converted_content = playbook_file.read_text()
-        
+
         # Verify modern module conversions
         expected_conversions = [
-            'ansible.builtin.package:',
-            'ansible.builtin.user:',
-            'ansible.builtin.file:',
-            'ansible.builtin.pip:',
-            'ansible.builtin.template:',
-            'ansible.builtin.systemd:',
-            'ansible.builtin.uri:',
-            'ansible.builtin.set_fact:',
-            'community.postgresql.postgresql_db:',
-            'community.postgresql.postgresql_user:'
+            "ansible.builtin.package:",
+            "ansible.builtin.user:",
+            "ansible.builtin.file:",
+            "ansible.builtin.pip:",
+            "ansible.builtin.template:",
+            "ansible.builtin.systemd:",
+            "ansible.builtin.uri:",
+            "ansible.builtin.set_fact:",
+            "community.postgresql.postgresql_db:",
+            "community.postgresql.postgresql_user:",
         ]
-        
+
         for conversion in expected_conversions:
             assert conversion in converted_content, f"Missing conversion: {conversion}"
-    
+
     def test_collections_compatibility(self, temp_dir):
         """Test compatibility with Ansible collections format."""
         converter = FQCNConverter()
-        
+
         playbook_file = temp_dir / "collections_test.yml"
         playbook_file.write_text(AnsibleVersionTestData.get_collections_playbook())
-        
+
         result = converter.convert_file(playbook_file, dry_run=False)
-        
+
         assert result.success is True
         assert result.changes_made > 0
-        
+
         converted_content = playbook_file.read_text()
-        
+
         # Short names should be converted
         builtin_conversions = [
-            'ansible.builtin.package:',
-            'ansible.builtin.service:',
-            'ansible.builtin.file:',
-            'ansible.builtin.copy:',
-            'ansible.builtin.template:',
-            'ansible.builtin.cron:',
-            'ansible.builtin.set_fact:'
+            "ansible.builtin.package:",
+            "ansible.builtin.service:",
+            "ansible.builtin.file:",
+            "ansible.builtin.copy:",
+            "ansible.builtin.template:",
+            "ansible.builtin.cron:",
+            "ansible.builtin.set_fact:",
         ]
-        
+
         for conversion in builtin_conversions:
-            assert conversion in converted_content, f"Missing builtin conversion: {conversion}"
-        
+            assert (
+                conversion in converted_content
+            ), f"Missing builtin conversion: {conversion}"
+
         # FQCN modules should remain unchanged
         fqcn_modules = [
-            'community.docker.docker_network:',
-            'community.docker.docker_container:',
-            'ansible.posix.firewalld:',
-            'community.mysql.mysql_db:',
-            'community.mysql.mysql_user:'
+            "community.docker.docker_network:",
+            "community.docker.docker_container:",
+            "ansible.posix.firewalld:",
+            "community.mysql.mysql_db:",
+            "community.mysql.mysql_user:",
         ]
-        
+
         for module in fqcn_modules:
             assert module in converted_content, f"FQCN module changed: {module}"
-    
+
     def test_legacy_syntax_variations(self, temp_dir):
         """Test conversion of various legacy syntax patterns."""
         converter = FQCNConverter()
-        
+
         legacy_variations = AnsibleVersionTestData.get_legacy_syntax_variations()
-        
+
         for variation_name, content in legacy_variations.items():
             test_file = temp_dir / f"legacy_{variation_name}.yml"
             test_file.write_text(content)
-            
+
             result = converter.convert_file(test_file, dry_run=False)
-            
+
             assert result.success is True, f"Failed to convert {variation_name}"
             assert result.changes_made > 0, f"No changes made for {variation_name}"
-            
+
             converted_content = test_file.read_text()
-            
+
             # Verify specific conversions based on variation
             if variation_name == "key_value_syntax":
-                assert 'ansible.builtin.yum:' in converted_content
-                assert 'ansible.builtin.service:' in converted_content
-                assert 'ansible.builtin.copy:' in converted_content
-                assert 'ansible.builtin.yum: name=' in converted_content
-            
+                assert "ansible.builtin.yum:" in converted_content
+                assert "ansible.builtin.service:" in converted_content
+                assert "ansible.builtin.copy:" in converted_content
+                assert "ansible.builtin.yum: name=" in converted_content
+
             elif variation_name == "with_items_syntax":
-                assert 'ansible.builtin.package:' in converted_content
-                assert 'ansible.builtin.user:' in converted_content
-            
+                assert "ansible.builtin.package:" in converted_content
+                assert "ansible.builtin.user:" in converted_content
+
             elif variation_name == "sudo_syntax":
-                assert 'ansible.builtin.package:' in converted_content
-                assert 'ansible.builtin.service:' in converted_content
-            
+                assert "ansible.builtin.package:" in converted_content
+                assert "ansible.builtin.service:" in converted_content
+
             elif variation_name == "bare_variables":
-                assert 'ansible.builtin.yum:' in converted_content
-                assert 'ansible.builtin.service:' in converted_content
-    
+                assert "ansible.builtin.yum:" in converted_content
+                assert "ansible.builtin.service:" in converted_content
+
     def test_mixed_version_compatibility(self, temp_dir):
         """Test handling of mixed version syntax in single playbook."""
         mixed_content = """---
@@ -798,44 +800,44 @@ class TestAnsibleVersionCompatibility:
         src: new.conf.j2
         dest: /etc/new.conf
 """
-        
+
         converter = FQCNConverter()
-        
+
         mixed_file = temp_dir / "mixed_versions.yml"
         mixed_file.write_text(mixed_content)
-        
+
         result = converter.convert_file(mixed_file, dry_run=False)
-        
+
         assert result.success is True
         assert result.changes_made > 0
-        
+
         converted_content = mixed_file.read_text()
-        
+
         # All short names should be converted
         expected_conversions = [
-            'ansible.builtin.yum:',
-            'ansible.builtin.package:',
-            'ansible.builtin.service:',
-            'ansible.builtin.systemd:',
-            'ansible.builtin.copy:',
-            'ansible.builtin.template:'
+            "ansible.builtin.yum:",
+            "ansible.builtin.package:",
+            "ansible.builtin.service:",
+            "ansible.builtin.systemd:",
+            "ansible.builtin.copy:",
+            "ansible.builtin.template:",
         ]
-        
+
         for conversion in expected_conversions:
             assert conversion in converted_content
-        
+
         # FQCN should remain unchanged
-        assert 'community.docker.docker_container:' in converted_content
-        
+        assert "community.docker.docker_container:" in converted_content
+
         # FQCN conversion should have occurred
-        assert 'ansible.builtin.yum: name=' in converted_content
-        assert 'ansible.builtin.service: name=' in converted_content
-        assert 'ansible.builtin.copy: src=' in converted_content
+        assert "ansible.builtin.yum: name=" in converted_content
+        assert "ansible.builtin.service: name=" in converted_content
+        assert "ansible.builtin.copy: src=" in converted_content
 
 
 class TestCollectionCompatibility:
     """Test compatibility with Ansible collections ecosystem."""
-    
+
     def test_community_collections_preservation(self, temp_dir):
         """Test that community collection modules are preserved."""
         community_modules_content = """---
@@ -918,39 +920,39 @@ class TestCollectionCompatibility:
         - docker
         - postgresql
 """
-        
+
         converter = FQCNConverter()
-        
+
         test_file = temp_dir / "community_collections.yml"
         test_file.write_text(community_modules_content)
-        
+
         result = converter.convert_file(test_file, dry_run=False)
-        
+
         assert result.success is True
-        
+
         converted_content = test_file.read_text()
-        
+
         # Community collection modules should remain unchanged
         community_modules = [
-            'community.general.timezone:',
-            'community.general.sudoers:',
-            'community.docker.docker_login:',
-            'community.docker.docker_compose:',
-            'community.mysql.mysql_db:',
-            'community.mysql.mysql_replication:',
-            'community.postgresql.postgresql_db:',
-            'community.postgresql.postgresql_ext:',
-            'ansible.posix.firewalld:',
-            'ansible.posix.mount:'
+            "community.general.timezone:",
+            "community.general.sudoers:",
+            "community.docker.docker_login:",
+            "community.docker.docker_compose:",
+            "community.mysql.mysql_db:",
+            "community.mysql.mysql_replication:",
+            "community.postgresql.postgresql_db:",
+            "community.postgresql.postgresql_ext:",
+            "ansible.posix.firewalld:",
+            "ansible.posix.mount:",
         ]
-        
+
         for module in community_modules:
             assert module in converted_content, f"Community module changed: {module}"
-        
+
         # Builtin modules should be converted
-        assert 'ansible.builtin.package:' in converted_content
-        assert 'ansible.builtin.service:' in converted_content
-    
+        assert "ansible.builtin.package:" in converted_content
+        assert "ansible.builtin.service:" in converted_content
+
     def test_custom_collections_handling(self, temp_dir):
         """Test handling of custom/unknown collections."""
         custom_collections_content = """---
@@ -993,34 +995,34 @@ class TestCollectionCompatibility:
       debug:
         var: ansible_facts.networking.default_ipv4.address
 """
-        
+
         converter = FQCNConverter()
-        
+
         test_file = temp_dir / "custom_collections.yml"
         test_file.write_text(custom_collections_content)
-        
+
         result = converter.convert_file(test_file, dry_run=False)
-        
+
         assert result.success is True
-        
+
         converted_content = test_file.read_text()
-        
+
         # Custom collection modules should remain unchanged
         custom_modules = [
-            'mycompany.myapp.deploy:',
-            'internal.tools.backup:',
-            'unknown.collection.module:'
+            "mycompany.myapp.deploy:",
+            "internal.tools.backup:",
+            "unknown.collection.module:",
         ]
-        
+
         for module in custom_modules:
             assert module in converted_content, f"Custom module changed: {module}"
-        
+
         # Builtin modules should be converted
-        assert 'ansible.builtin.file:' in converted_content
-        assert 'ansible.builtin.package:' in converted_content
-        assert 'ansible.builtin.command:' in converted_content
-        assert 'ansible.builtin.debug:' in converted_content
-        
+        assert "ansible.builtin.file:" in converted_content
+        assert "ansible.builtin.package:" in converted_content
+        assert "ansible.builtin.command:" in converted_content
+        assert "ansible.builtin.debug:" in converted_content
+
         # Content with dots should not be affected
         assert 'echo "test.example.com"' in converted_content
-        assert 'ansible_facts.networking.default_ipv4.address' in converted_content
+        assert "ansible_facts.networking.default_ipv4.address" in converted_content
