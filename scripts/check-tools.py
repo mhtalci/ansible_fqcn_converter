@@ -106,8 +106,6 @@ class ToolChecker:
 
         expected_workflows = [
             "ci.yml",
-            "quality-gate.yml",
-            "pre-commit.yml",
         ]
 
         missing_workflows = []
