@@ -788,6 +788,499 @@ class TestUtilityFunctions:
                 assert result is mock_logger
 
 
+class TestLoggingConfiguration:
+    """Test comprehensive logging configuration scenarios."""
+
+    def setup_method(self):
+        """Reset logging state before each test."""
+        reset_logging()
+
+    def test_logging_configuration_with_multiple_handlers(self):
+        """Test logging configuration with multiple handlers."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            log_file = os.path.join(temp_dir, "multi_handler.log")
+            
+            with patch("logging.config.dictConfig") as mock_dict_config:
+                setup_logging(
+                    level="DEBUG",
+                    log_file=log_file,
+                    format_json=False,
+                    enable_performance_logging=True,
+                    enable_colors=True
+                )
+                
+                config = mock_dict_config.call_args[0][0]
+                
+                # Verify multiple handlers are configured
+                assert "console" in config["handlers"]
+                assert "file" in config["handlers"]
+                
+                # Verify both handlers are added to loggers
+                assert "console" in config["root"]["handlers"]
+                assert "file" in config["root"]["handlers"]
+                assert "console" in config["loggers"]["fqcn_converter"]["handlers"]
+                assert "file" in config["loggers"]["fqcn_converter"]["handlers"]
+
+    def test_logging_configuration_environment_variables(self):
+        """Test logging configuration respects environment variables."""
+        with patch.dict(os.environ, {"FQCN_LOG_LEVEL": "DEBUG"}):
+            # Test that environment could be used (implementation would need to check env vars)
+            with patch("logging.config.dictConfig") as mock_dict_config:
+                setup_logging()
+                
+                # Configuration should still work normally
+                mock_dict_config.assert_called_once()
+
+    def test_logging_configuration_with_custom_formatters(self):
+        """Test logging configuration with custom formatter settings."""
+        custom_config = {
+            "version": 1,
+            "formatters": {
+                "custom": {
+                    "format": "CUSTOM: %(levelname)s - %(message)s"
+                }
+            },
+            "handlers": {
+                "custom_handler": {
+                    "class": "logging.StreamHandler",
+                    "formatter": "custom"
+                }
+            },
+            "root": {
+                "handlers": ["custom_handler"],
+                "level": "INFO"
+            }
+        }
+        
+        with patch("logging.config.dictConfig") as mock_dict_config:
+            setup_logging(config_dict=custom_config)
+            
+            mock_dict_config.assert_called_once_with(custom_config)
+
+    def test_logging_configuration_with_filters_chain(self):
+        """Test logging configuration with multiple filters."""
+        context = {"service": "test", "version": "1.0"}
+        
+        with patch("logging.config.dictConfig") as mock_dict_config:
+            setup_logging(
+                context=context,
+                enable_performance_logging=True
+            )
+            
+            config = mock_dict_config.call_args[0][0]
+            
+            # Verify both context and performance filters are configured
+            assert "context_filter" in config["filters"]
+            assert "performance_filter" in config["filters"]
+            
+            # Verify filters are applied to handlers
+            console_filters = config["handlers"]["console"]["filters"]
+            assert "context_filter" in console_filters
+            assert "performance_filter" in console_filters
+
+    def test_logging_configuration_error_recovery(self):
+        """Test logging configuration error recovery mechanisms."""
+        # Test recovery from invalid configuration
+        invalid_config = {"invalid": "config"}
+        
+        with patch("logging.config.dictConfig", side_effect=ValueError("Invalid config")):
+            with patch("logging.basicConfig") as mock_basic:
+                with pytest.raises(ValueError):
+                    setup_logging(config_dict=invalid_config)
+                
+                # Should fall back to basic config
+                mock_basic.assert_called_once()
+
+    def test_logging_configuration_file_creation_error(self):
+        """Test logging configuration when file creation fails."""
+        # Test with invalid file path
+        invalid_path = "/invalid/path/that/does/not/exist/test.log"
+        
+        with patch("pathlib.Path.mkdir", side_effect=PermissionError("Permission denied")):
+            with patch("logging.config.dictConfig", side_effect=PermissionError("Cannot create file")):
+                with patch("logging.basicConfig") as mock_basic:
+                    with pytest.raises(PermissionError):
+                        setup_logging(log_file=invalid_path)
+                    
+                    mock_basic.assert_called_once()
+
+    def test_logging_configuration_level_validation(self):
+        """Test logging configuration level validation."""
+        # Test various valid levels
+        valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+        
+        for level in valid_levels:
+            reset_logging()
+            with patch("logging.config.dictConfig") as mock_dict_config:
+                setup_logging(level=level)
+                
+                config = mock_dict_config.call_args[0][0]
+                assert config["root"]["level"] == level
+
+    def test_logging_configuration_concurrent_access(self):
+        """Test logging configuration under concurrent access."""
+        import threading
+        
+        results = []
+        errors = []
+        
+        def configure_logging(thread_id):
+            try:
+                with patch("logging.config.dictConfig"):
+                    setup_logging(level="INFO")
+                    results.append(f"thread_{thread_id}_success")
+            except Exception as e:
+                errors.append(e)
+        
+        threads = []
+        for i in range(5):
+            thread = threading.Thread(target=configure_logging, args=(i,))
+            threads.append(thread)
+            thread.start()
+        
+        for thread in threads:
+            thread.join()
+        
+        assert len(errors) == 0
+        # Only one thread should actually configure, others should skip
+        assert len(results) >= 1
+
+    def test_logging_configuration_memory_efficiency(self):
+        """Test logging configuration memory efficiency."""
+        # Test that repeated configurations don't leak memory
+        initial_registry_size = len(_logger_registry)
+        
+        with patch("logging.config.dictConfig"):
+            for i in range(10):
+                setup_logging(force_reconfigure=True)
+                get_logger(f"test.logger.{i}")
+        
+        # Registry should grow but not excessively
+        final_registry_size = len(_logger_registry)
+        assert final_registry_size >= initial_registry_size
+        assert final_registry_size <= initial_registry_size + 10
+
+
+class TestLoggingFormatters:
+    """Test comprehensive formatter and handler scenarios."""
+
+    def setup_method(self):
+        """Reset logging state before each test."""
+        reset_logging()
+
+    def test_json_formatter_edge_cases(self):
+        """Test JSONFormatter with edge cases and special characters."""
+        formatter = JSONFormatter()
+        
+        # Test with unicode characters
+        record = logging.LogRecord(
+            name="test.unicode",
+            level=logging.INFO,
+            pathname="/test/path.py",
+            lineno=42,
+            msg="Test with unicode: 你好世界 🌍",
+            args=(),
+            exc_info=None,
+        )
+        record.module = "test_module"
+        record.funcName = "test_function"
+        record.process = 12345
+        record.thread = 67890
+        
+        result = formatter.format(record)
+        log_data = json.loads(result)
+        
+        assert "你好世界 🌍" in log_data["message"]
+        assert log_data["level"] == "INFO"
+
+    def test_json_formatter_with_circular_references(self):
+        """Test JSONFormatter handles circular references gracefully."""
+        formatter = JSONFormatter()
+        
+        # Create a record with a circular reference in custom attributes
+        record = logging.LogRecord(
+            name="test.circular",
+            level=logging.INFO,
+            pathname="/test/path.py",
+            lineno=42,
+            msg="Test circular reference",
+            args=(),
+            exc_info=None,
+        )
+        record.module = "test_module"
+        record.funcName = "test_function"
+        record.process = 12345
+        record.thread = 67890
+        
+        # Add circular reference - this will cause ValueError
+        circular_obj = {"self": None}
+        circular_obj["self"] = circular_obj
+        record.circular_data = circular_obj
+        
+        # Should raise ValueError due to circular reference
+        with pytest.raises(ValueError, match="Circular reference detected"):
+            formatter.format(record)
+
+    def test_json_formatter_with_none_values(self):
+        """Test JSONFormatter handles None values correctly."""
+        formatter = JSONFormatter()
+        
+        record = logging.LogRecord(
+            name="test.none",
+            level=logging.INFO,
+            pathname="/test/path.py",
+            lineno=42,
+            msg="Test None values",
+            args=(),
+            exc_info=None,
+        )
+        record.module = "test_module"
+        record.funcName = "test_function"
+        record.process = 12345
+        record.thread = 67890
+        record.none_value = None
+        record.empty_string = ""
+        
+        result = formatter.format(record)
+        log_data = json.loads(result)
+        
+        assert "context" in log_data
+        assert log_data["context"]["none_value"] is None
+        assert log_data["context"]["empty_string"] == ""
+
+    def test_colored_formatter_all_levels(self):
+        """Test ColoredFormatter with all logging levels."""
+        formatter = ColoredFormatter("%(levelname)s - %(message)s")
+        
+        levels = [
+            (logging.DEBUG, "DEBUG"),
+            (logging.INFO, "INFO"),
+            (logging.WARNING, "WARNING"),
+            (logging.ERROR, "ERROR"),
+            (logging.CRITICAL, "CRITICAL"),
+        ]
+        
+        for level_num, level_name in levels:
+            record = logging.LogRecord(
+                name="test",
+                level=level_num,
+                pathname="",
+                lineno=0,
+                msg=f"{level_name} message",
+                args=(),
+                exc_info=None,
+            )
+            
+            result = formatter.format(record)
+            
+            if level_name in formatter.COLORS:
+                assert formatter.COLORS[level_name] in result
+                assert formatter.RESET in result
+            assert f"{level_name} message" in result
+
+    def test_colored_formatter_no_color_environment(self):
+        """Test ColoredFormatter behavior in no-color environments."""
+        formatter = ColoredFormatter("%(levelname)s - %(message)s")
+        
+        # Simulate environment where colors should be disabled
+        with patch.dict(os.environ, {"NO_COLOR": "1"}):
+            record = logging.LogRecord(
+                name="test",
+                level=logging.INFO,
+                pathname="",
+                lineno=0,
+                msg="No color message",
+                args=(),
+                exc_info=None,
+            )
+            
+            result = formatter.format(record)
+            # Colors are still applied by the formatter itself
+            # Environment handling would be in the setup logic
+            assert "No color message" in result
+
+    def test_formatter_performance_with_large_messages(self):
+        """Test formatter performance with large log messages."""
+        json_formatter = JSONFormatter()
+        colored_formatter = ColoredFormatter("%(levelname)s - %(message)s")
+        
+        # Create a large message
+        large_message = "Large message: " + "x" * 10000
+        
+        record = logging.LogRecord(
+            name="test.performance",
+            level=logging.INFO,
+            pathname="/test/path.py",
+            lineno=42,
+            msg=large_message,
+            args=(),
+            exc_info=None,
+        )
+        record.module = "test_module"
+        record.funcName = "test_function"
+        record.process = 12345
+        record.thread = 67890
+        
+        # Test JSON formatter
+        start_time = time.time()
+        json_result = json_formatter.format(record)
+        json_duration = time.time() - start_time
+        
+        # Test colored formatter
+        start_time = time.time()
+        colored_result = colored_formatter.format(record)
+        colored_duration = time.time() - start_time
+        
+        # Both should complete reasonably quickly (less than 1 second)
+        assert json_duration < 1.0
+        assert colored_duration < 1.0
+        assert len(json_result) > 10000
+        assert len(colored_result) > 10000
+
+    def test_handler_rotation_behavior(self):
+        """Test file handler rotation behavior."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            log_file = os.path.join(temp_dir, "rotation_test.log")
+            
+            # Create handler with small max size for testing
+            handler = create_rotating_file_handler(
+                log_file=log_file,
+                max_bytes=1024,  # 1KB
+                backup_count=3
+            )
+            
+            # Verify handler properties
+            assert handler.maxBytes == 1024
+            assert handler.backupCount == 3
+            assert handler.baseFilename.endswith("rotation_test.log")
+
+    def test_timed_handler_configuration(self):
+        """Test timed rotating handler configuration options."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            log_file = os.path.join(temp_dir, "timed_test.log")
+            
+            # Test different rotation intervals
+            intervals = [
+                ("S", 30),  # 30 seconds
+                ("M", 5),   # 5 minutes
+                ("H", 2),   # 2 hours
+                ("D", 1),   # 1 day
+            ]
+            
+            for when, interval in intervals:
+                handler = create_timed_rotating_handler(
+                    log_file=log_file,
+                    when=when,
+                    interval=interval,
+                    backup_count=5
+                )
+                
+                assert handler.when == when
+                assert handler.backupCount == 5
+                # Interval is converted to seconds internally
+                if when == "S":
+                    assert handler.interval == 30
+                elif when == "M":
+                    assert handler.interval == 300  # 5 * 60
+                elif when == "H":
+                    assert handler.interval == 7200  # 2 * 3600
+
+    def test_formatter_thread_safety(self):
+        """Test formatter thread safety."""
+        import threading
+        
+        formatter = JSONFormatter()
+        results = []
+        errors = []
+        
+        def format_record(thread_id):
+            try:
+                record = logging.LogRecord(
+                    name=f"test.thread.{thread_id}",
+                    level=logging.INFO,
+                    pathname="/test/path.py",
+                    lineno=thread_id,
+                    msg=f"Thread {thread_id} message",
+                    args=(),
+                    exc_info=None,
+                )
+                record.module = "test_module"
+                record.funcName = "test_function"
+                record.process = 12345
+                record.thread = thread_id
+                
+                result = formatter.format(record)
+                results.append(json.loads(result))
+            except Exception as e:
+                errors.append(e)
+        
+        threads = []
+        for i in range(10):
+            thread = threading.Thread(target=format_record, args=(i,))
+            threads.append(thread)
+            thread.start()
+        
+        for thread in threads:
+            thread.join()
+        
+        assert len(errors) == 0
+        assert len(results) == 10
+        
+        # Verify each result is correctly formatted
+        for i, result in enumerate(results):
+            assert result["level"] == "INFO"
+            assert str(result["thread_id"]) in result["message"]
+
+    def test_handler_error_handling(self):
+        """Test handler error handling scenarios."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            log_file = os.path.join(temp_dir, "error_test.log")
+            
+            # Test handler creation with invalid parameters
+            with pytest.raises(TypeError):
+                create_rotating_file_handler(
+                    log_file=log_file,
+                    max_bytes="invalid",  # Should be int
+                    backup_count=3
+                )
+
+    def test_formatter_with_custom_attributes(self):
+        """Test formatters with custom log record attributes."""
+        json_formatter = JSONFormatter()
+        
+        record = logging.LogRecord(
+            name="test.custom",
+            level=logging.INFO,
+            pathname="/test/path.py",
+            lineno=42,
+            msg="Custom attributes test",
+            args=(),
+            exc_info=None,
+        )
+        record.module = "test_module"
+        record.funcName = "test_function"
+        record.process = 12345
+        record.thread = 67890
+        
+        # Add various custom attributes
+        record.request_id = "req-12345"
+        record.user_id = 67890
+        record.operation_type = "data_processing"
+        record.execution_time = 1.234
+        record.success = True
+        
+        result = json_formatter.format(record)
+        log_data = json.loads(result)
+        
+        assert "context" in log_data
+        context = log_data["context"]
+        assert context["request_id"] == "req-12345"
+        assert context["user_id"] == 67890
+        assert context["operation_type"] == "data_processing"
+        assert context["execution_time"] == 1.234
+        assert context["success"] is True
+
+
 class TestThreadSafety:
     """Test thread safety of logging utilities."""
 

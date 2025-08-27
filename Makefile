@@ -41,14 +41,129 @@ format-check: ## Check code formatting without making changes
 	isort --check-only --diff src tests scripts
 
 # Testing targets
-test: ## Run tests
-	pytest
+test: ## Run tests sequentially
+	python scripts/run_tests.py sequential
 
 test-cov: ## Run tests with coverage
-	pytest --cov=fqcn_converter --cov-report=term-missing --cov-report=html --cov-report=xml
+	python scripts/run_tests.py coverage
 
-test-fast: ## Run tests in parallel
-	pytest -n auto
+test-parallel: ## Run tests in parallel
+	python scripts/run_tests.py parallel
+
+test-parallel-cov: ## Run tests in parallel with coverage
+	python scripts/run_tests.py parallel --coverage
+
+test-performance: ## Run performance tests
+	python scripts/run_tests.py performance
+
+test-unit: ## Run unit tests only
+	python scripts/run_tests.py sequential --markers "unit"
+
+test-integration: ## Run integration tests only
+	python scripts/run_tests.py sequential --markers "integration"
+
+test-unit-parallel: ## Run unit tests in parallel
+	python scripts/run_tests.py parallel --markers "unit"
+
+test-integration-parallel: ## Run integration tests in parallel
+	python scripts/run_tests.py parallel --markers "integration"
+
+test-validate-parallel: ## Validate parallel test setup
+	python scripts/run_tests.py validate
+
+test-fast: ## Run tests in parallel (alias for test-parallel)
+	python scripts/run_tests.py parallel
+
+# Comprehensive testing targets with enhanced reporting
+test-comprehensive: ## Run comprehensive test suite with detailed reporting
+	python scripts/run_comprehensive_tests.py
+
+test-comprehensive-parallel: ## Run comprehensive tests in parallel
+	python scripts/run_comprehensive_tests.py --mode parallel
+
+test-comprehensive-unit: ## Run comprehensive unit tests only
+	python scripts/run_comprehensive_tests.py --markers unit
+
+test-comprehensive-integration: ## Run comprehensive integration tests only
+	python scripts/run_comprehensive_tests.py --markers integration
+
+test-comprehensive-fast: ## Run comprehensive fast tests only
+	python scripts/run_comprehensive_tests.py --markers "unit and fast" --mode parallel
+
+test-comprehensive-baseline: ## Run tests and establish performance baselines
+	python scripts/run_comprehensive_tests.py --baseline
+
+test-comprehensive-validate: ## Validate comprehensive test environment
+	python scripts/run_comprehensive_tests.py --validate-only
+
+test-comprehensive-coverage-95: ## Run tests with 95% coverage threshold
+	python scripts/run_comprehensive_tests.py --coverage-threshold 95
+
+test-comprehensive-ci: ## Run comprehensive tests optimized for CI/CD
+	python scripts/run_comprehensive_tests.py --mode parallel --markers "not slow" --no-artifacts
+
+# Enhanced reporting targets with actionable insights
+test-reporting: ## Run tests with enhanced reporting and actionable insights
+	python scripts/run_comprehensive_reporting_tests.py
+
+test-reporting-parallel: ## Run tests with enhanced reporting in parallel
+	python scripts/run_comprehensive_reporting_tests.py --mode parallel
+
+test-reporting-unit: ## Run unit tests with enhanced reporting
+	python scripts/run_comprehensive_reporting_tests.py --markers unit
+
+test-reporting-integration: ## Run integration tests with enhanced reporting
+	python scripts/run_comprehensive_reporting_tests.py --markers integration
+
+test-reporting-fast: ## Run fast tests with enhanced reporting
+	python scripts/run_comprehensive_reporting_tests.py --markers "fast and unit" --mode parallel
+
+test-reporting-ci: ## Run tests with CI/CD optimized reporting
+	python scripts/run_comprehensive_reporting_tests.py --ci-optimized
+
+test-reporting-coverage-95: ## Run tests with 95% coverage threshold and enhanced reporting
+	python scripts/run_comprehensive_reporting_tests.py --coverage-threshold 95
+
+test-reporting-debug: ## Run tests with debug mode and enhanced reporting
+	python scripts/run_comprehensive_reporting_tests.py --debug
+
+# Generate enhanced reports from existing test data
+test-generate-reports: ## Generate enhanced reports from existing test data
+	python scripts/enhanced_test_reporter.py
+
+test-generate-reports-coverage: ## Generate reports from specific coverage data
+	python scripts/enhanced_test_reporter.py --coverage-data test_reports/coverage/coverage.json
+
+test-generate-reports-junit: ## Generate reports from JUnit XML data
+	python scripts/enhanced_test_reporter.py --test-results test_reports/junit/junit.xml
+
+test-reports: ## Generate test reports from last run
+	@echo "Opening test reports..."
+	@if [ -d "test_reports" ]; then \
+		echo "Test reports available in: test_reports/"; \
+		echo "- HTML Coverage: test_reports/coverage/html/index.html"; \
+		echo "- Summary: test_reports/test_summary_*.md"; \
+		echo "- Performance: test_reports/performance/performance_report_*.md"; \
+	else \
+		echo "No test reports found. Run 'make test-comprehensive' first."; \
+	fi
+
+test-reports-open: ## Open test reports in browser (macOS/Linux)
+	@if [ -d "test_reports/coverage/html" ]; then \
+		if command -v open >/dev/null 2>&1; then \
+			open test_reports/coverage/html/index.html; \
+		elif command -v xdg-open >/dev/null 2>&1; then \
+			xdg-open test_reports/coverage/html/index.html; \
+		else \
+			echo "Cannot open browser. View reports at: test_reports/coverage/html/index.html"; \
+		fi; \
+	else \
+		echo "No HTML coverage report found. Run 'make test-comprehensive' first."; \
+	fi
+
+test-clean-reports: ## Clean test reports directory
+	rm -rf test_reports/
+	@echo "Test reports cleaned."
 
 # Security targets
 security: ## Run security checks

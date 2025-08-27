@@ -38,6 +38,7 @@ dependencies = [
     "click>=7.0",
     "colorama>=0.4.3",
     "ruamel.yaml>=0.16.0",
+    "psutil>=5.8.0",
 ]
 dynamic = ["version"]
 
@@ -46,6 +47,8 @@ dev = [
     "pytest>=6.0",
     "pytest-cov>=2.10",
     "pytest-mock>=3.0",
+    "pytest-xdist>=2.5.0",
+    "pytest-forked>=1.4.0",
     "black>=22.0",
     "flake8>=4.0",
     "mypy>=0.900",
@@ -71,6 +74,10 @@ Documentation = "https://github.com/mhtalci/ansible_fqcn_converter#readme"
 fqcn-converter = "fqcn_converter.cli.main:main"
 fqcn-batch-converter = "fqcn_converter.cli.batch:main"
 fqcn-validator = "fqcn_converter.cli.validate:main"
+fqcn-interactive = "fqcn_converter.cli.interactive:interactive"
+fqcn-enhanced = "fqcn_converter.cli.enhanced:cli"
+fqcn-precommit = "fqcn_converter.tools.precommit:main"
+fqcn-config-gen = "fqcn_converter.tools.config_generator:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

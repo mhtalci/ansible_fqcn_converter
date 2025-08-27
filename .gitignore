@@ -46,6 +46,8 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
+coverage-*.xml
+coverage-*.json
 *.cover
 *.py,cover
 .hypothesis/
@@ -54,8 +56,29 @@ coverage.xml
 # Test output and temporary test files (but keep test source code)
 test_output/
 test_results/
+test_reports/
 .test_cache/
 *.test.log
+tests.log
+tests-*.log
+*-tests.log
+
+# Test configuration artifacts (keep source configs)
+pytest-*.ini
+.coveragerc-*
+*-coverage.rc
+
+# Test execution artifacts
+validation_report.md
+*_report.md
+*_summary.md
+test_summary_*.json
+test_summary_*.md
+executive_summary_*.json
+executive_summary_*.md
+actionable_insights_*.md
+cicd_summary_*.json
+report_manifest_*.json
 
 # Translations
 *.mo

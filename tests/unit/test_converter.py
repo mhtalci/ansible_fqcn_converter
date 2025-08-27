@@ -548,6 +548,364 @@ class TestFQCNConverter:
 
             assert "Unexpected error converting file" in str(exc_info.value)
 
+    def test_convert_content_dict_based_structure(self, converter):
+        """Test converting dictionary-based content (task files with dict structure)."""
+        content = """---
+tasks:
+  - name: Install package
+    package:
+      name: nginx
+      state: present
+  
+  - name: Start service
+    service:
+      name: nginx
+      state: started
+
+handlers:
+  - name: Restart nginx
+    service:
+      name: nginx
+      state: restarted
+
+pre_tasks:
+  - name: Update cache
+    package:
+      name: "*"
+      state: latest
+
+post_tasks:
+  - name: Cleanup
+    file:
+      path: /tmp/cleanup
+      state: absent
+"""
+
+        result = converter.convert_content(content)
+
+        assert result.success is True
+        assert result.changes_made == 5  # package (2x), service (2x), file (1x)
+        assert "ansible.builtin.package:" in result.converted_content
+        assert "ansible.builtin.service:" in result.converted_content
+        assert "ansible.builtin.file:" in result.converted_content
+
+    def test_convert_content_direct_module_tasks(self, converter):
+        """Test converting direct module tasks (without name)."""
+        content = """---
+- copy:
+    src: test.txt
+    dest: /tmp/test.txt
+
+- service:
+    name: nginx
+    state: started
+    
+- file:
+    path: /tmp/test
+    state: directory
+"""
+
+        result = converter.convert_content(content)
+
+        assert result.success is True
+        assert result.changes_made == 3  # copy, service, file
+        assert "- ansible.builtin.copy:" in result.converted_content
+        assert "- ansible.builtin.service:" in result.converted_content
+        assert "- ansible.builtin.file:" in result.converted_content
+
+    def test_convert_content_block_rescue_always(self, converter):
+        """Test converting content with block/rescue/always structures."""
+        content = """---
+- name: Complex block structure
+  block:
+    - name: Copy file
+      copy:
+        src: test.txt
+        dest: /tmp/test.txt
+    
+    - name: Set permissions
+      file:
+        path: /tmp/test.txt
+        mode: '0644'
+  
+  rescue:
+    - name: Debug failure
+      debug:
+        msg: "Copy failed"
+    
+    - name: Cleanup on failure
+      file:
+        path: /tmp/test.txt
+        state: absent
+  
+  always:
+    - name: Log completion
+      debug:
+        msg: "Task completed"
+"""
+
+        result = converter.convert_content(content)
+
+        assert result.success is True
+        assert result.changes_made == 5  # copy, file, debug (2x), file
+        assert "ansible.builtin.copy:" in result.converted_content
+        assert "ansible.builtin.file:" in result.converted_content
+        assert "ansible.builtin.debug:" in result.converted_content
+
+    def test_convert_content_non_dict_tasks(self, converter):
+        """Test handling of non-dict tasks in task list."""
+        # Mock the task processing to include non-dict items
+        content = """---
+- name: Valid task
+  copy:
+    src: test.txt
+    dest: /tmp/test.txt
+"""
+        
+        # This test covers the case where task is not a dict (line 426)
+        # We need to patch the YAML parsing to return mixed content
+        with patch('yaml.safe_load') as mock_yaml:
+            mock_yaml.return_value = [
+                {"name": "Valid task", "copy": {"src": "test.txt", "dest": "/tmp/test.txt"}},
+                "invalid_task_string",  # This will trigger the non-dict check
+                None  # This will also trigger the non-dict check
+            ]
+            
+            result = converter.convert_content(content)
+            
+            assert result.success is True
+            # Should still process the valid task
+            assert result.changes_made == 1
+
+    def test_convert_content_empty_yaml_list_with_non_dict_first_item(self, converter):
+        """Test handling of YAML list where first item is not a dict."""
+        # This covers the branch where yaml_data is a list but first item is not a dict
+        with patch('yaml.safe_load') as mock_yaml:
+            mock_yaml.return_value = ["string_item", "another_string"]
+            
+            content = "---\n- string_item\n- another_string"
+            result = converter.convert_content(content)
+            
+            assert result.success is True
+            assert result.changes_made == 0
+
+    def test_convert_content_line_boundary_edge_case(self, converter):
+        """Test edge case where line_idx exceeds lines length."""
+        content = """---
+- name: Test task
+  copy:
+    src: test.txt"""  # Intentionally truncated to test boundary condition
+        
+        result = converter.convert_content(content)
+        
+        assert result.success is True
+        assert result.changes_made == 1
+        assert "ansible.builtin.copy:" in result.converted_content
+
+    def test_convert_content_with_comments_and_empty_lines(self, converter):
+        """Test conversion with comments and empty lines in tasks."""
+        content = """---
+- name: Task with comments
+  # This is a comment
+  copy:
+    src: test.txt
+    dest: /tmp/test.txt
+  
+  # Another comment
+
+- name: Another task
+  
+  service:
+    name: nginx
+    state: started
+"""
+
+        result = converter.convert_content(content)
+
+        assert result.success is True
+        assert result.changes_made == 2  # copy and service
+        assert "ansible.builtin.copy:" in result.converted_content
+        assert "ansible.builtin.service:" in result.converted_content
+        # Ensure comments are preserved
+        assert "# This is a comment" in result.converted_content
+        assert "# Another comment" in result.converted_content
+
+    def test_convert_content_mixed_yaml_structures(self, converter):
+        """Test conversion with mixed YAML structures."""
+        content = """---
+# Mix of playbook and task structures
+- hosts: localhost
+  tasks:
+    - name: Playbook task
+      copy:
+        src: test1.txt
+        dest: /tmp/test1.txt
+
+- hosts: another_host
+  tasks:
+    - name: Another playbook task
+      service:
+        name: nginx
+        state: started
+"""
+
+        result = converter.convert_content(content)
+
+        assert result.success is True
+        assert result.changes_made == 2  # copy and service
+        assert "ansible.builtin.copy:" in result.converted_content
+        assert "ansible.builtin.service:" in result.converted_content
+
+    def test_init_with_backup_settings(self, sample_mappings):
+        """Test converter initialization with backup settings."""
+        with patch("fqcn_converter.core.converter.ConfigurationManager") as mock_config:
+            mock_config.return_value.load_default_mappings.return_value = sample_mappings
+            mock_config.return_value.merge_mappings.return_value = sample_mappings
+
+            # Test with custom backup settings
+            converter = FQCNConverter(
+                create_backups=False,
+                backup_suffix=".custom_backup"
+            )
+
+            # Verify the converter was initialized (we can't directly test private attributes)
+            assert converter._mappings == sample_mappings
+
+    def test_get_fqcn_mapping_caching(self, converter):
+        """Test FQCN mapping caching functionality."""
+        # First call should populate cache
+        result1 = converter._get_fqcn_mapping("copy")
+        assert result1 == "ansible.builtin.copy"
+        
+        # Second call should use cache
+        result2 = converter._get_fqcn_mapping("copy")
+        assert result2 == "ansible.builtin.copy"
+        
+        # Test with unknown module
+        result3 = converter._get_fqcn_mapping("unknown_module")
+        assert result3 is None
+        
+        # Second call for unknown module should also use cache
+        result4 = converter._get_fqcn_mapping("unknown_module")
+        assert result4 is None
+
+    def test_init_with_both_config_path_and_custom_mappings(self, sample_mappings):
+        """Test converter initialization with both config path and custom mappings."""
+        custom_config = {"custom_module": "custom.collection.module"}
+        custom_mappings = {"override_module": "override.collection.module"}
+        merged_mappings = {**sample_mappings, **custom_config, **custom_mappings}
+
+        with patch("fqcn_converter.core.converter.ConfigurationManager") as mock_config:
+            mock_config.return_value.load_default_mappings.return_value = sample_mappings
+            mock_config.return_value.load_custom_mappings.return_value = custom_config
+            mock_config.return_value.merge_mappings.side_effect = [
+                {**sample_mappings, **custom_config},  # First merge: defaults + custom config
+                merged_mappings  # Second merge: previous + custom mappings
+            ]
+
+            converter = FQCNConverter(
+                config_path="/path/to/config.yml",
+                custom_mappings=custom_mappings
+            )
+
+            assert converter._mappings == merged_mappings
+            mock_config.return_value.load_custom_mappings.assert_called_once_with("/path/to/config.yml")
+            assert mock_config.return_value.merge_mappings.call_count == 2
+
+    def test_convert_content_line_index_boundary_edge_case(self, converter):
+        """Test edge case where line_idx could exceed lines length during processing."""
+        # Create a scenario with very short content that might trigger boundary checks
+        content = """---
+- name: Short task
+  copy: {}"""  # Very minimal content
+        
+        result = converter.convert_content(content)
+        
+        assert result.success is True
+        assert result.changes_made == 1
+
+    def test_convert_content_list_item_pattern_matching(self, converter):
+        """Test list item pattern matching in task conversion."""
+        # Create content that will trigger the list item pattern (line 518)
+        content = """---
+- copy:
+    src: test1.txt
+    dest: /tmp/test1.txt
+- service:
+    name: nginx
+    state: started
+"""
+        
+        result = converter.convert_content(content)
+        
+        assert result.success is True
+        assert result.changes_made == 2
+        assert "- ansible.builtin.copy:" in result.converted_content
+        assert "- ansible.builtin.service:" in result.converted_content
+
+    def test_convert_content_task_boundary_edge_cases(self, converter):
+        """Test various edge cases in task boundary detection."""
+        # Test content with mixed task formats that could trigger edge cases
+        content = """---
+- name: Named task
+  copy:
+    src: test.txt
+    dest: /tmp/test.txt
+
+- name: Another named task
+  service:
+    name: nginx
+    state: started
+
+- file:
+    path: /tmp/test
+    state: directory
+"""
+        
+        result = converter.convert_content(content)
+        
+        assert result.success is True
+        # Should convert all three modules
+        assert result.changes_made == 3
+        assert "ansible.builtin.copy:" in result.converted_content
+        assert "ansible.builtin.service:" in result.converted_content  
+        assert "ansible.builtin.file:" in result.converted_content
+
+    def test_convert_content_empty_task_list(self, converter):
+        """Test conversion with empty task list."""
+        content = """---
+tasks: []
+handlers: []
+"""
+        
+        result = converter.convert_content(content)
+        
+        assert result.success is True
+        assert result.changes_made == 0
+
+    def test_convert_content_malformed_task_boundaries(self, converter):
+        """Test handling of malformed task boundaries."""
+        # Content that might cause issues with task boundary detection
+        content = """---
+- name: Task with weird formatting
+  # Comment between name and module
+  
+  copy:
+    src: test.txt
+    dest: /tmp/test.txt
+
+- # Just a dash
+  service:
+    name: nginx
+"""
+        
+        result = converter.convert_content(content)
+        
+        assert result.success is True
+        # Should still convert the modules it can identify
+        assert result.changes_made >= 1
+        assert "ansible.builtin.copy:" in result.converted_content
+
 
 class TestConversionResult:
     """Test cases for ConversionResult dataclass."""

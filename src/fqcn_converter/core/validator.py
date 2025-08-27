@@ -623,3 +623,12 @@ class ValidationEngine:
                     break  # Only count one module per task
 
         return total_modules, fqcn_modules, short_modules
+
+
+    def validate_file(self, file_path: Union[str, Path]) -> ValidationResult:
+        """Alias for validate_conversion for backward compatibility."""
+        return self.validate_conversion(file_path)
+
+
+# Alias for backward compatibility and simpler imports
+FQCNValidator = ValidationEngine
